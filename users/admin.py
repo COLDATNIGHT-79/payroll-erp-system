@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from .models import Company, Branch, Department, User
 
 
@@ -23,7 +24,14 @@ class DepartmentAdmin(admin.ModelAdmin):
 
 
 @admin.register(User)
-class UserAdmin(admin.ModelAdmin):
+class UserAdmin(BaseUserAdmin):
     list_display = ("username", "employee_id", "role", "branch", "department")
-    list_filter = ("role", "branch", "department")
+    list_filter = ("role", "branch", "department", "is_staff", "is_active")
     search_fields = ("username", "employee_id")
+
+    fieldsets = BaseUserAdmin.fieldsets + (
+        ('Employee Details', {'fields': ('employee_id', 'role', 'per_day_salary', 'company', 'branch', 'department', 'manager')}),
+    )
+    add_fieldsets = BaseUserAdmin.add_fieldsets + (
+        ('Employee Details', {'fields': ('employee_id', 'role', 'per_day_salary', 'company', 'branch', 'department', 'manager')}),
+    )

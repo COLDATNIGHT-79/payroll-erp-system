@@ -80,11 +80,14 @@ WSGI_APPLICATION = 'erp.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'payroll_erp',
-        'USER': 'postgres',
-        'PASSWORD': 'Deep12&&@@',
-        'HOST': 'localhost',
+        'NAME': 'neondb',
+        'USER': 'neondb_owner',
+        'PASSWORD': 'npg_wpWANfn0vbc1',
+        'HOST': 'ep-broad-king-a147vm6g.ap-southeast-1.aws.neon.tech',
         'PORT': '5432',
+        'OPTIONS': {
+            'sslmode': 'require',
+        },
     }
 }
 # Password validation
