@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<!-- HEADER -->
+<div class="mb-4 pb-2 border-b border-[#e0d8c8] flex justify-between items-end">
+    <div>
+        <h1 class="text-2xl font-medium tracking-tight text-[#2b4222]">
+            New Employee Onboarding
+        </h1>
+        <p class="text-[#5c5c5c] text-xs uppercase tracking-wider mt-1">
+            System Registration
+        </p>
+    </div>
+    <a href="{% url 'employee_list' %}" class="text-gray-500 hover:text-[#2b4222] text-xs uppercase tracking-wider">
+        Cancel / Back
+    </a>
+</div>
+
+<div class="bg-white p-6 border border-[#e0d8c8] rounded-none max-w-2xl">
+    <form method="POST" action="{% url 'add_employee' %}" class="space-y-4">
+        {% csrf_token %}
+        
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="block text-[10px] uppercase tracking-wide text-gray-500 mb-1">First Name</label>
+                <input type="text" name="first_name" required class="w-full text-sm border border-[#e0d8c8] p-2 focus:outline-none focus:border-[#2b4222] bg-[#faf6f0]">
+            </div>
+            <div>
+                <label class="block text-[10px] uppercase tracking-wide text-gray-500 mb-1">Last Name</label>
+                <input type="text" name="last_name" required class="w-full text-sm border border-[#e0d8c8] p-2 focus:outline-none focus:border-[#2b4222] bg-[#faf6f0]">
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="block text-[10px] uppercase tracking-wide text-gray-500 mb-1">Username</label>
+                <input type="text" name="username" required class="w-full text-sm border border-[#e0d8c8] p-2 focus:outline-none focus:border-[#2b4222] bg-[#faf6f0]">
+            </div>
+            <div>
+                <label class="block text-[10px] uppercase tracking-wide text-gray-500 mb-1">Email</label>
+                <input type="email" name="email" required class="w-full text-sm border border-[#e0d8c8] p-2 focus:outline-none focus:border-[#2b4222] bg-[#faf6f0]">
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="block text-[10px] uppercase tracking-wide text-gray-500 mb-1">Employee ID</label>
+                <input type="text" name="employee_id" required class="w-full text-sm border border-[#e0d8c8] p-2 focus:outline-none focus:border-[#2b4222] bg-[#faf6f0]">
+            </div>
+            <div>
+                <label class="block text-[10px] uppercase tracking-wide text-gray-500 mb-1">Temporary Password</label>
+                <input type="password" name="password" required class="w-full text-sm border border-[#e0d8c8] p-2 focus:outline-none focus:border-[#2b4222] bg-[#faf6f0]">
+            </div>
+        </div>
+
+        <button type="submit" class="mt-4 w-full bg-[#2b4222] text-white py-3 text-sm uppercase tracking-wider font-semibold hover:bg-[#1f3019] transition-colors border border-[#2b4222]">
+            Create Employee Profile
+        </button>
+    </form>
+</div>
+
+{% endblock %}

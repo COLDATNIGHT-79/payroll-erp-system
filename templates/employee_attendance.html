@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- HEADER -->
+<div class="mb-4 pb-2 border-b border-[#e0d8c8]">
+    <h1 class="text-2xl font-medium tracking-tight text-[#2b4222]">
+        My Attendance
+    </h1>
+    <p class="text-[#5c5c5c] text-xs uppercase tracking-wider mt-1">
+        Record your daily entry and exit
+    </p>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+    <!-- ATTENDANCE PANEL -->
+    <div class="bg-white p-6 border border-[#e0d8c8] rounded-none">
+        <h2 class="text-sm uppercase tracking-wider text-gray-500 mb-4 border-b border-[#e0d8c8] pb-2">Today's Record ({{ today|date:"M d, Y" }})</h2>
+        
+        <div class="grid grid-cols-2 gap-4 mb-6">
+            <div class="p-3 bg-[#faf6f0] border border-[#e0d8c8]">
+                <p class="text-[10px] uppercase tracking-wider text-gray-500 mb-1">Check In</p>
+                <p class="text-lg font-medium text-[#2b4222]">{{ attendance.check_in|default:"Not recorded yet" }}</p>
+            </div>
+            <div class="p-3 bg-[#faf6f0] border border-[#e0d8c8]">
+                <p class="text-[10px] uppercase tracking-wider text-gray-500 mb-1">Check Out</p>
+                <p class="text-lg font-medium text-[#2b4222]">{{ attendance.check_out|default:"Not recorded yet" }}</p>
+            </div>
+        </div>
+
+        <div>
+            <p class="text-[10px] uppercase tracking-wider text-gray-500 mb-2">Current Status</p>
+            {% if attendance.status == "PRESENT" %}
+                <span class="border border-[#2b4222] text-[#2b4222] px-3 py-1 text-xs uppercase tracking-wide">Present</span>
+            {% elif attendance.status == "MISS_PUNCH" %}
+                <span class="border border-orange-500 text-orange-600 px-3 py-1 text-xs uppercase tracking-wide">Miss Punch</span>
+            {% else %}
+                <span class="border border-gray-400 text-gray-600 px-3 py-1 text-xs uppercase tracking-wide">Absent</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- ACTIONS PANEL -->
+    <div class="bg-white p-6 border border-[#e0d8c8] rounded-none">
+        <h2 class="text-sm uppercase tracking-wider text-gray-500 mb-4 border-b border-[#e0d8c8] pb-2">Punch Terminal</h2>
+        
+        <div class="space-y-4">
+            <!-- CHECK IN BUTTON -->
+            <form method="POST" action="{% url 'employee_attendance' %}">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="check_in">
+                <button type="submit" 
+                        class="w-full py-3 {% if attendance.check_in %}bg-gray-300 text-gray-500 cursor-not-allowed border-gray-300{% else %}bg-[#2b4222] hover:bg-[#1f3019] text-white border-[#2b4222]{% endif %} border text-sm uppercase tracking-wider font-semibold transition-colors"
+                        {% if attendance.check_in %}disabled{% endif %}>
+                    Check In
+                </button>
+            </form>
+
+            <!-- CHECK OUT BUTTON -->
+            <form method="POST" action="{% url 'employee_attendance' %}">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="check_out">
+                <button type="submit" 
+                        class="w-full py-3 {% if attendance.check_out %}bg-gray-300 text-gray-500 cursor-not-allowed border-gray-300{% elif not attendance.check_in %}bg-white border-[#2b4222] text-[#2b4222] opacity-70 hover:opacity-100{% else %}bg-[#2b4222] hover:bg-[#1f3019] text-white border-[#2b4222]{% endif %} border text-sm uppercase tracking-wider font-semibold transition-colors"
+                        {% if attendance.check_out %}disabled{% endif %}>
+                    Check Out
+                </button>
+            </form>
+            
+            <p class="text-xs text-gray-500 mt-4 leading-relaxed">
+                <strong>Important:</strong> You must check in before checking out. If you fail to check in or out correctly, your status will be listed as <strong>MISS PUNCH</strong> and requires HR clarification.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

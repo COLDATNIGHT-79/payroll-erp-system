@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="mb-4 pb-2 border-b border-[#e0d8c8]">
+    <h1 class="text-2xl font-medium tracking-tight text-[#2b4222]">HR / Manager Dashboard</h1>
+    <p class="text-[#5c5c5c] text-xs uppercase tracking-wider mt-1">Team oversight, approvals, and attendance alerts</p>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+    <div class="bg-white p-4 border border-[#e0d8c8] rounded-none">
+        <p class="text-xs uppercase tracking-wider text-gray-500 mb-1">Total Employees</p>
+        <h2 class="text-2xl font-semibold text-[#2b4222]">{{ total_employees }}</h2>
+    </div>
+    <div class="bg-white p-4 border border-[#e0d8c8] rounded-none">
+        <p class="text-xs uppercase tracking-wider text-gray-500 mb-1">Attendance Today</p>
+        <h2 class="text-2xl font-semibold text-[#2b4222]">{{ attendance_today }}</h2>
+    </div>
+    <div class="bg-white p-4 border border-[#e0d8c8] rounded-none">
+        <p class="text-xs uppercase tracking-wider text-gray-500 mb-1">Pending Requests</p>
+        <h2 class="text-2xl font-semibold text-[#2b4222]">{{ leaves_pending }}</h2>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-4 mb-4">
+    <div class="bg-white p-4 border border-[#e0d8c8] rounded-none">
+        <h2 class="text-sm uppercase tracking-wider text-gray-500 mb-3">Live Attendance Feed</h2>
+        <ul class="space-y-3 text-sm text-[#2b4222]">
+            {% for scan in live_feed %}
+            <li class="border border-[#e0d8c8] p-3 rounded-none">
+                <p class="font-medium">{{ scan.employee.get_full_name|default:scan.employee.username }}</p>
+                <p class="text-xs text-gray-500 mt-1">Checked in at {{ scan.check_in|default:"--" }}</p>
+            </li>
+            {% empty %}
+            <li class="text-gray-400">No live scans yet.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="bg-white p-4 border border-[#e0d8c8] rounded-none">
+        <h2 class="text-sm uppercase tracking-wider text-gray-500 mb-3">Approval Queue</h2>
+        <ul class="space-y-3 text-sm text-[#2b4222]">
+            {% for leave in pending_leave_requests %}
+            <li class="border border-[#e0d8c8] p-3 rounded-none">
+                <p class="font-medium">{{ leave.employee.get_full_name|default:leave.employee.username }}</p>
+                <p class="text-xs text-gray-500 mt-1">{{ leave.leave_type }} leave from {{ leave.start_date }} to {{ leave.end_date }}</p>
+            </li>
+            {% empty %}
+            <li class="text-gray-400">No pending approvals.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="bg-white p-4 border border-[#e0d8c8] rounded-none">
+        <h2 class="text-sm uppercase tracking-wider text-gray-500 mb-3">Work Hour Trends</h2>
+        <p class="text-3xl font-semibold text-[#2b4222]">{{ avg_hours }}h</p>
+        <p class="text-xs text-gray-500 mt-2">Average daily hours this week</p>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 xl:grid-cols-2 gap-4 mb-4">
+    <div class="bg-white p-4 border border-[#e0d8c8] rounded-none">
+        <h2 class="text-sm uppercase tracking-wider text-gray-500 mb-3">Employee Roster</h2>
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-[#e0d8c8] text-[#2b4222] text-xs uppercase tracking-wider">
+                    <th class="py-2 text-left">Name</th>
+                    <th class="py-2 text-left">Role</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for employee in employees %}
+                <tr class="border-b border-[#e0d8c8] hover:bg-[#faf6f0]">
+                    <td class="py-2">{{ employee.get_full_name|default:employee.username }}</td>
+                    <td class="py-2">{{ employee.role|title }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="2" class="py-4 text-center text-gray-400">No employees found</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="bg-white p-4 border border-[#e0d8c8] rounded-none">
+        <h2 class="text-sm uppercase tracking-wider text-gray-500 mb-3">Checkout Alerts</h2>
+        {% if checkout_alerts %}
+        <ul class="space-y-3 text-sm text-[#2b4222]">
+            {% for alert in checkout_alerts %}
+            <li class="border border-[#e0d8c8] p-3 rounded-none">
+                <p class="font-medium">{{ alert.employee.get_full_name|default:alert.employee.username }}</p>
+                <p class="text-xs text-gray-500 mt-1">Checked in at {{ alert.check_in|default:"--" }}, no checkout yet</p>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="text-gray-400">No checkout issues detected today.</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="bg-white p-4 border border-[#e0d8c8] rounded-none">
+    <h2 class="text-sm uppercase tracking-wider text-gray-500 mb-3">Hardware Inventory</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm text-[#2b4222]">
+        {% for item in hardware_inventory %}
+        <div class="border border-[#e0d8c8] p-3 rounded-none">
+            <p class="font-medium">{{ item.asset }}</p>
+            <p class="text-xs text-gray-500 mt-1">Assigned to {{ item.assigned_to }}</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}

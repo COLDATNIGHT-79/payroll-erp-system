@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>ERP System</title>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+
+body {
+    display:flex;
+    min-height:100vh;
+    font-family: 'Inter', sans-serif;
+    margin:0;
+    background-color: #faf6f0; /* Paper-like warm feel */
+    color: #333333;
+}
+
+.sidebar {
+    width:250px;
+    background-color: #fffaf2;
+    border-right:1px solid #e0d8c8;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    padding:20px;
+    box-shadow: none;
+}
+
+.sidebar h3 {
+    font-weight:600;
+    margin-bottom:16px;
+    font-size:18px;
+    color: #2b4222;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.sidebar a {
+    display:block;
+    color: #5c5c5c;
+    padding:8px 12px;
+    margin-bottom:4px;
+    border-radius:0px; /* Sharp edges */
+    text-decoration:none;
+    font-size:14px;
+    font-weight: 500;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.sidebar a:hover {
+    background: #fdf2e3; /* yellowish pale orange hover */
+    color: #d97706; /* orange accent */
+    transform: translateX(5px);
+}
+
+.sidebar a.active {
+    background: #3a5a40; /* solid green */
+    color: #ffffff;
+    font-weight:600;
+    box-shadow: 0 4px 6px rgba(58, 90, 64, 0.3);
+}
+
+/* MAIN */
+.main {
+    flex:1;
+    background: #faf6f0;
+    display:flex;
+    flex-direction:column;
+}
+
+.topbar {
+    background: #fffcf7;
+    padding:8px 16px;
+    border-bottom:1px solid #e0d8c8;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+/* SEARCH */
+.search-box {
+    width:280px;
+    padding:6px 10px;
+    border:1px solid #d4cebe;
+    border-radius:0px; /* Sharp edges */
+    font-size:13px;
+    background: #faf6f0;
+    transition: all 0.2s ease;
+}
+
+.search-box:focus {
+    outline: none;
+    border-color: #2b4222;
+    background: #ffffff;
+}
+
+/* PROFILE */
+.profile {
+    display:flex;
+    align-items:center;
+    gap:8px;
+    cursor:pointer;
+    position:relative;
+    padding: 4px 8px;
+    border-radius: 0px;
+    transition: background 0.2s ease;
+}
+
+.profile:hover {
+    background: #fdf2e3;
+}
+
+.avatar {
+    width:32px;
+    height:32px;
+    border-radius:0px; /* Sharp edges */
+    background: #2b4222; /* Uni-color */
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:13px;
+    font-weight: 600;
+}
+
+/* DROPDOWN */
+.dropdown-menu-custom {
+    display:none;
+    position:absolute;
+    top:40px;
+    right:0;
+    background: #fffaf2;
+    border:1px solid #e0d8c8;
+    border-radius:0px;
+    box-shadow:2px 2px 0px rgba(0,0,0,0.1); /* Sharp shadow */
+    min-width:140px;
+    z-index:100;
+    overflow: hidden;
+    animation: slideDown 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transform-origin: top right;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.dropdown-menu-custom a {
+    display:block;
+    padding:12px 16px;
+    font-size:14px;
+    text-decoration:none;
+    color:#4a4a4a;
+    transition: all 0.2s;
+}
+
+.dropdown-menu-custom a:hover {
+    background: #fdf2e3;
+    color: #d97706;
+    padding-left: 20px; /* Snappy hover effect */
+}
+
+/* CONTENT */
+.content {
+    padding:16px; /* Reduced dead space */
+    width:100%;
+}
+
+/* Global Cafe Elements */
+.content .card {
+    background: #fffcf7 !important;
+    border: 1px solid #e0d8c8 !important;
+    border-radius: 0px !important; /* Sharp */
+    box-shadow: none !important;
+    transition: background 0.2s ease !important;
+}
+
+.content .card:hover {
+    transform: none;
+    background: #fdfaf4 !important;
+    box-shadow: none !important;
+}
+
+.content h2, .content h3, .content h4 {
+    color: #2b4222;
+    font-weight: 600;
+}
+
+.btn {
+    transition: background 0.2s ease !important;
+    border-radius: 0px !important; /* Sharp */
+    font-weight: 500 !important;
+    border: 1px solid #2b4222 !important;
+    background-color: #2b4222 !important; /* Uni-color */
+    color: white !important;
+    box-shadow: none !important;
+}
+
+.btn:hover, .btn:active, .btn:focus {
+    background-color: #1f3019 !important;
+    border-color: #1f3019 !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* Overriding bootstrap contextual buttons for uni-color minimal approach */
+.btn-primary, .btn-success, .btn-danger {
+    background-color: #2b4222 !important;
+    border-color: #2b4222 !important;
+    color: white !important;
+}
+
+.btn-primary:hover, .btn-success:hover, .btn-danger:hover {
+    background-color: #1f3019 !important;
+    border-color: #1f3019 !important;
+}
+
+table {
+    background: #fffcf7;
+    border-radius: 0px; /* Sharp */
+    overflow: hidden;
+    box-shadow: none;
+    border: 1px solid #e0d8c8;
+}
+
+thead, .table-light {
+    background-color: #fdf2e3 !important;
+    color: #2b4222 !important;
+}
+
+th, td {
+    border-bottom: 1px solid #e0d8c8 !important;
+}
+
+/* Snappy entrance animation */
+.content {
+    animation: fadeInSlideUp 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+@keyframes fadeInSlideUp {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+
+<div>
+
+<!-- 🔥 DYNAMIC PORTAL NAME -->
+<h3>
+    {% if request.user.role_id == 2 %}
+        Data Supervisor
+    {% else %}
+        Employee Portal
+    {% endif %}
+</h3>
+
+<!-- 🔥 DASHBOARD -->
+<!-- 🔥 DASHBOARD -->
+<a href="
+{% if request.user.role == 'ADMIN' %}
+    {% url 'admin_dashboard' %}
+{% elif request.user.role == 'HR' %}
+    {% url 'hr_dashboard' %}
+{% elif request.user.role == 'MANAGER' %}
+    {% url 'manager_dashboard' %}
+{% elif request.user.role == 'FINANCE' %}
+    {% url 'finance_dashboard' %}
+{% else %}
+    {% url 'employee_dashboard' %}
+{% endif %}
+" class="active">Dashboard</a>
+
+<!-- 👤 EMPLOYEE -->
+{% if request.user.role == 'EMPLOYEE' %}
+    <a href="{% url 'employee_attendance' %}">My Attendance</a>
+    <a href="#">My Leaves</a>
+    <a href="{% url 'employee_assets' %}">My Assets</a>
+{% endif %}
+
+<!-- 👨‍💼 HR / MANAGER -->
+{% if request.user.role == 'HR' or request.user.role == 'MANAGER' %}
+    <a href="{% url 'employee_list' %}">Employee Roster</a>
+    <a href="#">Leave Approvals</a>
+    <a href="#">Live Dashboard</a>
+{% endif %}
+
+<!-- 👑 ADMIN -->
+{% if request.user.role == 'ADMIN' %}
+    <a href="{% url 'employee_list' %}">Global Directory</a>
+    <a href="#">System Settings</a>
+    <a href="#">Activity Logs</a>
+    <a href="#">Hardware Inventory</a>
+{% endif %}
+
+<!-- 💰 FINANCE -->
+{% if request.user.role == 'FINANCE' %}
+    <a href="#">Payroll Run</a>
+    <a href="#">Deductions & Taxes</a>
+    <a href="#">Salary Slips</a>
+{% endif %}
+
+</div>
+
+<!-- USER -->
+<div class="profile" onclick="toggleDropdown()">
+<div class="avatar">
+    {{ request.user.username|slice:":2"|upper }}
+</div>
+
+<div>
+<div style="font-size:13px; font-weight:500;">
+    {{ request.user.username }}
+</div>
+<div style="font-size:11px; color:#6b7280;">
+    {{ request.user.get_role_id_display }}
+</div>
+</div>
+
+<!-- DROPDOWN -->
+<div id="dropdown" class="dropdown-menu-custom">
+    <a href="#">Profile</a>
+    <a href="{% url 'logout' %}" style="color:red;">Logout</a>
+</div>
+
+</div>
+
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+<!-- TOPBAR -->
+<div class="topbar">
+
+<input type="text" placeholder="Search..." class="search-box">
+
+<div class="profile" onclick="toggleDropdown()">
+<span style="font-size:13px;">{{ request.user.username }}</span>
+
+<div class="avatar">
+    {{ request.user.username|slice:":2"|upper }}
+</div>
+
+<div id="dropdown2" class="dropdown-menu-custom">
+    <a href="{% url 'employee_profile' %}">Profile</a>
+    <a href="{% url 'logout' %}" style="color:red;">Logout</a>
+</div>
+
+</div>
+
+</div>
+
+<!-- CONTENT -->
+<div class="content">
+{% block content %}
+{% endblock %}
+</div>
+
+</div>
+
+<footer class="px-6 py-3 border-t border-[#e0d8c8] text-xs text-gray-500 bg-[#fffdf8]">
+    Biometric Security: fingerprint data is stored as a mathematical template, not an image. Scanner data is sent from the ESP32 to the server over HTTPS encryption.
+</footer>
+
+<script>
+function toggleDropdown(){
+    let d1 = document.getElementById("dropdown");
+    let d2 = document.getElementById("dropdown2");
+
+    if(d1) d1.style.display = d1.style.display === "block" ? "none" : "block";
+    if(d2) d2.style.display = d2.style.display === "block" ? "none" : "block";
+}
+</script>
+
+</body>
+</html>

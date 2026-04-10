@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- HEADER -->
+<div class="mb-4 pb-2 border-b border-[#e0d8c8]">
+    <h1 class="text-2xl font-medium tracking-tight text-[#2b4222]">
+        My Assets
+    </h1>
+    <p class="text-[#5c5c5c] text-xs uppercase tracking-wider mt-1">
+        Hardware Assigned To You
+    </p>
+</div>
+
+<div class="bg-white p-6 border border-[#e0d8c8] rounded-none max-w-lg">
+    <h2 class="text-sm uppercase tracking-wider text-gray-500 mb-4 border-b border-[#e0d8c8] pb-2">Hardware Inventory</h2>
+    <table class="w-full text-sm">
+        <thead>
+            <tr class="border-b border-[#e0d8c8] text-[#2b4222] text-xs uppercase tracking-wider">
+                <th class="py-2 text-left font-medium">Asset Details</th>
+                <th class="py-2 text-right font-medium">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for asset in assets %}
+            <tr class="border-b border-[#e0d8c8] hover:bg-[#faf6f0] transition-colors">
+                <td class="py-3 font-medium text-[#2b4222]">{{ asset.item }}</td>
+                <td class="py-3 text-right">
+                    <span class="border border-[#2b4222] text-[#2b4222] px-2 py-1 text-[10px] uppercase tracking-wide">{{ asset.status }}</span>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="2" class="text-center text-gray-400 py-6 text-xs uppercase tracking-wider">No assets assigned</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

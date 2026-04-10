@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<!-- HEADER -->
+<div class="mb-4 pb-2 border-b border-[#e0d8c8]">
+    <h1 class="text-2xl font-medium tracking-tight text-[#2b4222]">
+        Welcome back, {{ request.user.first_name|default:request.user.username }}
+    </h1>
+    <p class="text-[#5c5c5c] text-xs uppercase tracking-wider mt-1">
+        Finance Operations & Payroll Management Hub
+    </p>
+</div>
+
+<!-- TOP STATUS -->
+<div class="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-4">
+    <div class="bg-white p-4 border border-[#e0d8c8] rounded-none">
+        <p class="text-xs uppercase tracking-wider text-gray-500 mb-1">Total Payroll Budget</p>
+        <h2 class="text-xl font-semibold text-[#2b4222]">₹ {{ total_budget|floatformat:2 }}</h2>
+    </div>
+    
+    <div class="bg-white p-4 border border-[#e0d8c8] rounded-none">
+        <p class="text-xs uppercase tracking-wider text-gray-500 mb-1">Processed Salaries</p>
+        <h2 class="text-xl font-semibold text-[#2b4222]">{{ processed_salaries }}</h2>
+    </div>
+
+    <div class="bg-white p-4 border border-[#e0d8c8] rounded-none">
+        <p class="text-xs uppercase tracking-wider text-gray-500 mb-1">Pending Invoices</p>
+        <h2 class="text-xl font-semibold text-orange-600">0</h2>
+    </div>
+
+    <div class="bg-white p-4 border border-[#e0d8c8] rounded-none">
+        <p class="text-xs uppercase tracking-wider text-gray-500 mb-1">Total Deductions</p>
+        <h2 class="text-xl font-semibold text-[#2b4222]">₹ {{ total_deductions|floatformat:2 }}</h2>
+    </div>
+</div>
+
+<!-- PAYROLL ROSTER -->
+<div class="bg-white p-4 border border-[#e0d8c8] rounded-none mb-4">
+    <h2 class="text-sm uppercase tracking-wider text-gray-500 mb-3 border-b border-[#e0d8c8] pb-2">Dynamic Payroll Roster (Current Month)</h2>
+    
+    <table class="w-full text-sm">
+        <thead>
+            <tr class="border-b border-[#e0d8c8] text-[#2b4222] text-xs uppercase tracking-wider">
+                <th class="py-2 text-left font-medium">Employee</th>
+                <th class="py-2 text-left font-medium">Present/Absent</th>
+                <th class="py-2 text-left font-medium">Per Day Rate</th>
+                <th class="py-2 text-right font-medium">Absence Deduction</th>
+                <th class="py-2 text-right font-medium">Final Salary</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in payroll_data %}
+            <tr class="border-b border-[#e0d8c8] hover:bg-[#faf6f0] transition-colors">
+                <td class="py-3 font-medium text-gray-700">{{ item.employee.get_full_name|default:item.employee.username }}</td>
+                <td class="py-3 text-gray-600">{{ item.present_days }} / {{ item.absent_days }}</td>
+                <td class="py-3 text-gray-600">₹ {{ item.base|floatformat:2 }}</td>
+                <td class="py-3 text-right font-medium text-red-600">- ₹ {{ item.deduction_loss|floatformat:2 }}</td>
+                <td class="py-3 text-right font-semibold text-[#2b4222]">₹ {{ item.final_salary|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="bg-white p-4 border border-[#e0d8c8] rounded-none">
+        <h2 class="text-sm uppercase tracking-wider text-gray-500 mb-3">Recent Transactions</h2>
+        <ul class="space-y-3 text-sm">
+            <li class="flex justify-between border-b border-[#faf6f0] pb-2">
+                <span class="text-gray-600">Office Supplies Procurement</span>
+                <span class="font-medium text-red-600">- ₹ 5,400</span>
+            </li>
+            <li class="flex justify-between border-b border-[#faf6f0] pb-2">
+                <span class="text-gray-600">Client Payment (Nexus IT)</span>
+                <span class="font-medium text-green-600">+ ₹ 1,20,000</span>
+            </li>
+            <li class="flex justify-between pb-2">
+                <span class="text-gray-600">Software Subscriptions (Annual)</span>
+                <span class="font-medium text-red-600">- ₹ 15,000</span>
+            </li>
+        </ul>
+    </div>
+
+    <div class="bg-white p-4 border border-[#e0d8c8] rounded-none">
+        <h2 class="text-sm uppercase tracking-wider text-gray-500 mb-3">Finance Tools</h2>
+        <div class="flex flex-col gap-2">
+            <button class="border border-[#2b4222] text-[#2b4222] text-xs uppercase tracking-wider py-2 hover:bg-[#2b4222] hover:text-white transition-colors">Run Monthly Payroll</button>
+            <button class="border border-gray-400 text-gray-600 text-xs uppercase tracking-wider py-2 hover:bg-gray-100 transition-colors">Download Tax Reports</button>
+            <button class="border border-gray-400 text-gray-600 text-xs uppercase tracking-wider py-2 hover:bg-gray-100 transition-colors">Audit Logs</button>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

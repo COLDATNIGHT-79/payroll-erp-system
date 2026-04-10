@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<!-- HEADER -->
+<div class="mb-4 pb-2 border-b border-[#e0d8c8]">
+    <h1 class="text-2xl font-medium tracking-tight text-[#2b4222]">
+        Welcome back, {{ request.user.first_name|default:request.user.username }}
+    </h1>
+    <p class="text-[#5c5c5c] text-xs uppercase tracking-wider mt-1">
+        Personal productivity & attendance at a glance
+    </p>
+</div>
+
+<!-- TOP STATUS -->
+<div class="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-4">
+    <div class="bg-white p-4 border border-[#e0d8c8] rounded-none">
+        <p class="text-xs uppercase tracking-wider text-gray-500 mb-1">Projected Salary (Live)</p>
+        <div class="flex items-center gap-2">
+            <span class="text-xl font-semibold text-[#2b4222]">₹ {{ payroll_total|floatformat:2 }}</span>
+            <span class="text-[10px] text-gray-400">based on attendance</span>
+        </div>
+    </div>
+
+    <div class="bg-white p-4 border border-[#e0d8c8] rounded-none">
+        <p class="text-xs uppercase tracking-wider text-gray-500 mb-1">Monthly Presence</p>
+        <h2 class="text-xl font-semibold text-[#2b4222]">{{ days_present }}</h2>
+    </div>
+
+    <div class="bg-white p-4 border border-[#e0d8c8] rounded-none">
+        <p class="text-xs uppercase tracking-wider text-gray-500 mb-1">Pending Leaves</p>
+        <h2 class="text-xl font-semibold text-[#2b4222]">{{ leaves_pending }}</h2>
+    </div>
+
+    <div class="bg-white p-4 border border-[#e0d8c8] rounded-none">
+        <p class="text-xs uppercase tracking-wider text-gray-500 mb-1">Today&apos;s Summary</p>
+        <p class="text-sm text-[#5c5c5c]">{{ daily_stats }}</p>
+    </div>
+</div>
+
+<!-- ACTIONS -->
+<div class="grid grid-cols-1 gap-4 mb-4">
+    <div class="bg-white p-4 border border-[#e0d8c8] rounded-none">
+        <h2 class="text-sm uppercase tracking-wider text-gray-500 mb-3">Knowledge Bank</h2>
+        <ul class="space-y-2 text-sm text-[#2b4222]">
+            {% for item in knowledge_links %}
+            <li><a href="{{ item.url }}" class="text-[#2b4222] hover:text-[#1f3019]">• {{ item.title }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+<!-- RECENT ACTIVITY -->
+<div class="bg-white p-4 border border-[#e0d8c8] rounded-none mb-4">
+    <h2 class="text-sm uppercase tracking-wider text-gray-500 mb-3">Recent Activity</h2>
+    <p class="text-sm text-[#5c5c5c]">{{ recent_activity }}</p>
+</div>
+
+<!-- ATTENDANCE TABLE -->
+<div class="bg-white p-4 border border-[#e0d8c8] rounded-none">
+    <div class="flex justify-between items-center mb-3">
+        <div>
+            <h2 class="text-base font-semibold text-[#2b4222]">My Attendance</h2>
+            <p class="text-xs uppercase tracking-wider text-gray-500">Latest records</p>
+        </div>
+        <a href="#" class="text-xs uppercase text-[#2b4222]">View calendar</a>
+    </div>
+
+    <table class="w-full text-sm">
+        <thead>
+            <tr class="border-b border-[#e0d8c8] text-[#2b4222] text-xs uppercase tracking-wider">
+                <th class="py-2 text-left font-medium">Date</th>
+                <th class="py-2 text-left font-medium">Check In</th>
+                <th class="py-2 text-left font-medium">Check Out</th>
+                <th class="py-2 text-left font-medium">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in attendance %}
+            <tr class="border-b border-[#e0d8c8] hover:bg-[#faf6f0] transition-colors">
+                <td class="py-3 font-medium text-gray-700">{{ record.date }}</td>
+                <td class="py-3 text-gray-600">{{ record.check_in|default:"--" }}</td>
+                <td class="py-3 text-gray-600">{{ record.check_out|default:"--" }}</td>
+                <td class="py-3">
+                    {% with status=record.get_status_display %}
+                        {% if status == "Present" %}
+                            <span class="border border-[#2b4222] text-[#2b4222] px-2 py-1 text-[10px] uppercase tracking-wide">Present</span>
+                        {% elif status == "Absent" %}
+                            <span class="border border-red-600 text-red-600 px-2 py-1 text-[10px] uppercase tracking-wide">Absent</span>
+                        {% elif status == "Miss Punch" %}
+                            <span class="border border-orange-500 text-orange-600 px-2 py-1 text-[10px] uppercase tracking-wide">Miss Punch</span>
+                        {% else %}
+                            <span class="border border-gray-400 text-gray-600 px-2 py-1 text-[10px] uppercase tracking-wide">{{ status }}</span>
+                        {% endif %}
+                    {% endwith %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="text-center text-gray-400 py-6 text-xs uppercase tracking-wider">No attendance records found</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- LIVE CALENDAR -->
+<div id="calendar" class="bg-white p-4 border border-[#e0d8c8] rounded-none mt-4">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-3">
+        <div>
+            <h2 class="text-base font-semibold text-[#2b4222]">Live Attendance Calendar</h2>
+            <p class="text-xs uppercase tracking-wider text-gray-500">Current month overview</p>
+        </div>
+        <div class="flex items-center gap-3 text-xs uppercase text-gray-500">
+            <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-green-200 border border-green-400"></span> Present</span>
+            <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-yellow-200 border border-yellow-400"></span> Late</span>
+            <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-red-200 border border-red-400"></span> Absent</span>
+            <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-blue-200 border border-blue-400"></span> Holiday</span>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-7 gap-2 text-[10px] uppercase tracking-wide text-gray-500 mb-2">
+        <span class="text-center">Sun</span>
+        <span class="text-center">Mon</span>
+        <span class="text-center">Tue</span>
+        <span class="text-center">Wed</span>
+        <span class="text-center">Thu</span>
+        <span class="text-center">Fri</span>
+        <span class="text-center">Sat</span>
+    </div>
+    <div class="grid grid-cols-7 gap-2 text-center text-sm">
+        {% for day in calendar_days %}
+            <div class="border border-[#e0d8c8] rounded-none py-3 {% if day.status == 'present' %}bg-green-50 text-green-700{% elif day.status == 'late' %}bg-yellow-50 text-yellow-700{% elif day.status == 'absent' %}bg-red-50 text-red-700{% else %}bg-blue-50 text-blue-700{% endif %}">
+                <span class="block font-semibold">{{ day.day }}</span>
+                <span class="block text-[10px] uppercase tracking-wide">{{ day.status }}</span>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}
