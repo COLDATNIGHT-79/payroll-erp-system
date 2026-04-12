@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<!-- HEADER -->
+<div class="mb-6">
+    <h1 style="font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--green-deep); margin-bottom: 4px;">
+        Nexus ERP Demo Hub
+    </h1>
+    <p style="font-size: 13px; color: var(--text-muted);">
+        Fast-track links to view the newly revamped dashboards with dummy data. No login required.
+    </p>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+
+    <!-- ADMIN -->
+    <a href="{% url 'demo_admin' %}" class="demo-card-link">
+        <div class="panel stagger demo-card" style="height: 100%;">
+            <div style="width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, var(--green-mid), var(--green-accent)); display: flex; align-items: center; justify-content: center; margin-bottom: 16px; color: white;">
+                <i data-lucide="shield" style="width: 24px; height: 24px;"></i>
+            </div>
+            <h2 style="font-size: 18px; font-weight: 700; color: var(--green-deep); margin-bottom: 8px;">Admin Dashboard</h2>
+            <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.5; margin: 0;">Command center with system overview, announcement posting, and full organization statistics.</p>
+        </div>
+    </a>
+
+    <!-- HR -->
+    <a href="{% url 'demo_hr' %}" class="demo-card-link">
+        <div class="panel stagger demo-card" style="animation-delay: 0.1s; height: 100%;">
+            <div style="width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, var(--brown-mid), var(--brown-accent)); display: flex; align-items: center; justify-content: center; margin-bottom: 16px; color: white;">
+                <i data-lucide="briefcase" style="width: 24px; height: 24px;"></i>
+            </div>
+            <h2 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">HR Dashboard</h2>
+            <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.5; margin: 0;">People management, live attendance feeds, priority approval queues, and employee rosters.</p>
+        </div>
+    </a>
+
+    <!-- FINANCE -->
+    <a href="{% url 'demo_finance' %}" class="demo-card-link">
+        <div class="panel stagger demo-card" style="animation-delay: 0.15s; height: 100%;">
+            <div style="width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, var(--accent-red), #e74c3c); display: flex; align-items: center; justify-content: center; margin-bottom: 16px; color: white;">
+                <i data-lucide="wallet" style="width: 24px; height: 24px;"></i>
+            </div>
+            <h2 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">Finance Hub</h2>
+            <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.5; margin: 0;">Dynamic payroll roster, total deductions and computations with transaction overview.</p>
+        </div>
+    </a>
+
+    <!-- EMPLOYEE -->
+    <a href="{% url 'demo_employee' %}" class="demo-card-link">
+        <div class="panel stagger demo-card" style="animation-delay: 0.2s; height: 100%;">
+            <div style="width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, #3498db, var(--accent-blue)); display: flex; align-items: center; justify-content: center; margin-bottom: 16px; color: white;">
+                <i data-lucide="user" style="width: 24px; height: 24px;"></i>
+            </div>
+            <h2 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">Employee Portal</h2>
+            <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.5; margin: 0;">Personal productivity, attendance calendar, knowledge bank access, and daily hour tracking.</p>
+        </div>
+    </a>
+
+</div>
+
+<style>
+.demo-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+.demo-card {
+    transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+    cursor: pointer;
+}
+.demo-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--glass-shadow-hover);
+    border-color: var(--green-accent);
+}
+</style>
+
+{% endblock %}

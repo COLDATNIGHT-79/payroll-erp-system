@@ -1,76 +1,116 @@
 {% extends "base.html" %}
 
 {% block content %}
+
 <!-- HEADER -->
-<div class="mb-4 pb-2 border-b border-[#e0d8c8]">
-    <h1 class="text-2xl font-medium tracking-tight text-[#2b4222]">
+<div class="mb-6">
+    <h1 style="font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--green-deep); margin-bottom: 4px;">
         My Attendance
     </h1>
-    <p class="text-[#5c5c5c] text-xs uppercase tracking-wider mt-1">
-        Record your daily entry and exit
-    </p>
+    <p style="font-size: 13px; color: var(--text-muted);">Record your daily entry and exit</p>
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-    <!-- ATTENDANCE PANEL -->
-    <div class="bg-white p-6 border border-[#e0d8c8] rounded-none">
-        <h2 class="text-sm uppercase tracking-wider text-gray-500 mb-4 border-b border-[#e0d8c8] pb-2">Today's Record ({{ today|date:"M d, Y" }})</h2>
-        
+    <!-- TODAY'S RECORD -->
+    <div class="panel stagger">
+        <div class="panel-title"><i data-lucide="clipboard-list" class="panel-icon"></i> Today's Record ({{ today|date:"M d, Y" }})</div>
+
         <div class="grid grid-cols-2 gap-4 mb-6">
-            <div class="p-3 bg-[#faf6f0] border border-[#e0d8c8]">
-                <p class="text-[10px] uppercase tracking-wider text-gray-500 mb-1">Check In</p>
-                <p class="text-lg font-medium text-[#2b4222]">{{ attendance.check_in|default:"Not recorded yet" }}</p>
+            <div style="padding: 16px; background: var(--bg-card-alt); border: 1px solid var(--border-light); border-radius: 10px;">
+                <p style="font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 6px; font-weight: 600;">Check In</p>
+                <p style="font-size: 18px; font-weight: 700; color: var(--green-deep); margin: 0;">{{ attendance.check_in|default:"Not recorded" }}</p>
             </div>
-            <div class="p-3 bg-[#faf6f0] border border-[#e0d8c8]">
-                <p class="text-[10px] uppercase tracking-wider text-gray-500 mb-1">Check Out</p>
-                <p class="text-lg font-medium text-[#2b4222]">{{ attendance.check_out|default:"Not recorded yet" }}</p>
+            <div style="padding: 16px; background: var(--bg-card-alt); border: 1px solid var(--border-light); border-radius: 10px;">
+                <p style="font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 6px; font-weight: 600;">Check Out</p>
+                <p style="font-size: 18px; font-weight: 700; color: var(--green-deep); margin: 0;">{{ attendance.check_out|default:"Not recorded" }}</p>
             </div>
         </div>
 
         <div>
-            <p class="text-[10px] uppercase tracking-wider text-gray-500 mb-2">Current Status</p>
+            <p style="font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 8px; font-weight: 600;">Current Status</p>
             {% if attendance.status == "PRESENT" %}
-                <span class="border border-[#2b4222] text-[#2b4222] px-3 py-1 text-xs uppercase tracking-wide">Present</span>
+                <span class="badge-cafe badge-green" style="font-size: 12px; padding: 6px 14px;">Present</span>
             {% elif attendance.status == "MISS_PUNCH" %}
-                <span class="border border-orange-500 text-orange-600 px-3 py-1 text-xs uppercase tracking-wide">Miss Punch</span>
+                <span class="badge-cafe badge-orange" style="font-size: 12px; padding: 6px 14px;">Miss Punch</span>
             {% else %}
-                <span class="border border-gray-400 text-gray-600 px-3 py-1 text-xs uppercase tracking-wide">Absent</span>
+                <span class="badge-cafe badge-red" style="font-size: 12px; padding: 6px 14px;">Absent</span>
             {% endif %}
         </div>
     </div>
 
-    <!-- ACTIONS PANEL -->
-    <div class="bg-white p-6 border border-[#e0d8c8] rounded-none">
-        <h2 class="text-sm uppercase tracking-wider text-gray-500 mb-4 border-b border-[#e0d8c8] pb-2">Punch Terminal</h2>
-        
-        <div class="space-y-4">
-            <!-- CHECK IN BUTTON -->
+    <!-- PUNCH TERMINAL -->
+    <style>
+        .punch-btn {
+            width: 100%; padding: 16px; font-size: 14px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.8px; border-radius: 12px;
+            border: none; cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        .punch-btn-checkin {
+            background: linear-gradient(135deg, var(--green-mid), var(--green-deep));
+            color: white; box-shadow: 0 4px 16px rgba(58, 90, 64, 0.3);
+        }
+        .punch-btn-checkin:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(58, 90, 64, 0.4);
+        }
+        .punch-btn-checkout {
+            background: linear-gradient(135deg, var(--brown-mid), var(--brown-deep));
+            color: white; box-shadow: 0 4px 16px rgba(139, 111, 78, 0.3);
+        }
+        .punch-btn-checkout:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(139, 111, 78, 0.4);
+        }
+        .punch-btn-disabled {
+            background: #e5e7eb; color: #9ca3af; cursor: not-allowed;
+        }
+        .punch-btn-disabled:hover {
+            transform: none; box-shadow: none;
+        }
+        .punch-btn-waiting {
+            background: var(--bg-card-alt); color: var(--green-deep);
+            border: 2px solid var(--border); opacity: 0.7;
+        }
+        .punch-btn-waiting:hover {
+            transform: none;
+        }
+    </style>
+    <div class="panel stagger">
+        <div class="panel-title"><i data-lucide="clock" class="panel-icon"></i> Punch Terminal</div>
+
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+            <!-- CHECK IN -->
             <form method="POST" action="{% url 'employee_attendance' %}">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="check_in">
-                <button type="submit" 
-                        class="w-full py-3 {% if attendance.check_in %}bg-gray-300 text-gray-500 cursor-not-allowed border-gray-300{% else %}bg-[#2b4222] hover:bg-[#1f3019] text-white border-[#2b4222]{% endif %} border text-sm uppercase tracking-wider font-semibold transition-colors"
+                <button type="submit"
+                        class="punch-btn {% if attendance.check_in %}punch-btn-disabled{% else %}punch-btn-checkin{% endif %}"
                         {% if attendance.check_in %}disabled{% endif %}>
-                    Check In
+                    {% if attendance.check_in %}Checked In{% else %}Check In{% endif %}
                 </button>
             </form>
 
-            <!-- CHECK OUT BUTTON -->
+            <!-- CHECK OUT -->
             <form method="POST" action="{% url 'employee_attendance' %}">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="check_out">
-                <button type="submit" 
-                        class="w-full py-3 {% if attendance.check_out %}bg-gray-300 text-gray-500 cursor-not-allowed border-gray-300{% elif not attendance.check_in %}bg-white border-[#2b4222] text-[#2b4222] opacity-70 hover:opacity-100{% else %}bg-[#2b4222] hover:bg-[#1f3019] text-white border-[#2b4222]{% endif %} border text-sm uppercase tracking-wider font-semibold transition-colors"
+                <button type="submit"
+                        class="punch-btn {% if attendance.check_out %}punch-btn-disabled{% elif not attendance.check_in %}punch-btn-waiting{% else %}punch-btn-checkout{% endif %}"
                         {% if attendance.check_out %}disabled{% endif %}>
-                    Check Out
+                    {% if attendance.check_out %}Checked Out{% else %}Check Out{% endif %}
                 </button>
             </form>
-            
-            <p class="text-xs text-gray-500 mt-4 leading-relaxed">
-                <strong>Important:</strong> You must check in before checking out. If you fail to check in or out correctly, your status will be listed as <strong>MISS PUNCH</strong> and requires HR clarification.
-            </p>
+
+            <div style="background: var(--bg-card-alt); border: 1px solid var(--border-light); border-radius: 10px; padding: 14px; margin-top: 6px;">
+                <p style="font-size: 12px; color: var(--text-secondary); margin: 0; line-height: 1.6;">
+                    <strong style="color: var(--text-primary);">Note:</strong> You must check in before checking out. Failure to do so will result in a <strong style="color: var(--accent-orange);">MISS PUNCH</strong> status requiring HR clarification.
+                </p>
+            </div>
         </div>
     </div>
+
 </div>
+
 {% endblock %}
