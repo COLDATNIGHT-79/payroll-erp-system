@@ -1,21 +1,46 @@
 {% extends "base.html" %}
 
 {% block content %}
+
 <!-- HEADER -->
-<div class="mb-4 pb-2 border-b border-[#e0d8c8]">
-    <h1 class="text-2xl font-medium tracking-tight text-[#2b4222]">
+<div class="mb-6">
+    <h1 style="font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--green-deep); margin-bottom: 4px;">
         My Profile
     </h1>
-    <p class="text-[#5c5c5c] text-xs uppercase tracking-wider mt-1">
-        Your Personal Information
-    </p>
+    <p style="font-size: 13px; color: var(--text-muted);">Your personal information</p>
 </div>
 
-<div class="bg-white p-6 border border-[#e0d8c8] rounded-none max-w-md space-y-4">
-    <h2 class="text-sm uppercase tracking-wider text-gray-500 mb-4 border-b border-[#e0d8c8] pb-2">Profile Details</h2>
-    <p class="text-sm text-[#5c5c5c]"><strong>Name:</strong> {{ profile_title }}</p>
-    <p class="text-sm text-[#5c5c5c]"><strong>Designation:</strong> {{ profile_role }}</p>
-    <p class="text-sm text-[#5c5c5c]"><strong>Employee ID:</strong> {{ profile_id }}</p>
-    <p class="text-sm text-[#5c5c5c]"><strong>Department:</strong> {{ profile_department }}</p>
+<div class="panel stagger" style="max-width: 500px;">
+    <!-- AVATAR -->
+    <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--border-light);">
+        <div style="width: 56px; height: 56px; border-radius: 14px; background: linear-gradient(135deg, var(--green-mid), var(--green-accent)); display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; font-weight: 700; box-shadow: 0 6px 20px rgba(58, 90, 64, 0.3);">
+            {{ request.user.username|slice:":2"|upper }}
+        </div>
+        <div>
+            <h2 style="font-size: 18px; font-weight: 700; color: var(--green-deep); margin: 0;">{{ profile_title }}</h2>
+            <span class="badge-cafe badge-green" style="margin-top: 4px;">{{ profile_role }}</span>
+        </div>
+    </div>
+
+    <!-- DETAILS -->
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+        <div style="display: flex; justify-content: space-between; padding: 10px 14px; background: var(--bg-card-alt); border-radius: 10px; border: 1px solid var(--border-light);">
+            <span style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Full Name</span>
+            <span style="font-size: 13px; font-weight: 600; color: var(--text-primary);">{{ profile_title }}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding: 10px 14px; background: var(--bg-card-alt); border-radius: 10px; border: 1px solid var(--border-light);">
+            <span style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Designation</span>
+            <span style="font-size: 13px; font-weight: 600; color: var(--text-primary);">{{ profile_role }}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding: 10px 14px; background: var(--bg-card-alt); border-radius: 10px; border: 1px solid var(--border-light);">
+            <span style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Employee ID</span>
+            <span style="font-size: 13px; font-weight: 600; color: var(--text-primary); font-family: monospace;">{{ profile_id }}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding: 10px 14px; background: var(--bg-card-alt); border-radius: 10px; border: 1px solid var(--border-light);">
+            <span style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Department</span>
+            <span style="font-size: 13px; font-weight: 600; color: var(--text-primary);">{{ profile_department }}</span>
+        </div>
+    </div>
 </div>
+
 {% endblock %}

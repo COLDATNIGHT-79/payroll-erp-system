@@ -3,59 +3,75 @@
 {% block content %}
 
 <!-- HEADER -->
-<div class="mb-4 pb-2 border-b border-[#e0d8c8] flex justify-between items-end">
+<div class="mb-6" style="display: flex; justify-content: space-between; align-items: flex-end;">
     <div>
-        <h1 class="text-2xl font-medium tracking-tight text-[#2b4222]">
+        <h1 style="font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--green-deep); margin-bottom: 4px;">
             New Employee Onboarding
         </h1>
-        <p class="text-[#5c5c5c] text-xs uppercase tracking-wider mt-1">
-            System Registration
-        </p>
+        <p style="font-size: 13px; color: var(--text-muted);">System Registration</p>
     </div>
-    <a href="{% url 'employee_list' %}" class="text-gray-500 hover:text-[#2b4222] text-xs uppercase tracking-wider">
-        Cancel / Back
-    </a>
+    <a href="{% url 'employee_list' %}" class="btn-cafe btn-cafe-outline" style="font-size: 11px; gap: 6px;"><i data-lucide="arrow-left" style="width:12px;height:12px;"></i> Back to Directory</a>
 </div>
 
-<div class="bg-white p-6 border border-[#e0d8c8] rounded-none max-w-2xl">
-    <form method="POST" action="{% url 'add_employee' %}" class="space-y-4">
+<div class="panel stagger" style="max-width: 680px;">
+    <div class="panel-title"><i data-lucide="user-plus" class="panel-icon"></i> Employee Details</div>
+
+    <form method="POST" action="{% url 'add_employee' %}" style="display: flex; flex-direction: column; gap: 16px;">
         {% csrf_token %}
-        
+
         <div class="grid grid-cols-2 gap-4">
             <div>
-                <label class="block text-[10px] uppercase tracking-wide text-gray-500 mb-1">First Name</label>
-                <input type="text" name="first_name" required class="w-full text-sm border border-[#e0d8c8] p-2 focus:outline-none focus:border-[#2b4222] bg-[#faf6f0]">
+                <label style="display: block; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 6px; font-weight: 600;">First Name</label>
+                <input type="text" name="first_name" required
+                       style="width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 10px; font-size: 13px; background: var(--bg-card-alt); transition: all 0.2s;"
+                       onfocus="this.style.borderColor='var(--green-mid)';this.style.boxShadow='0 0 0 3px rgba(58,90,64,0.1)'"
+                       onblur="this.style.borderColor='var(--border)';this.style.boxShadow='none'">
             </div>
             <div>
-                <label class="block text-[10px] uppercase tracking-wide text-gray-500 mb-1">Last Name</label>
-                <input type="text" name="last_name" required class="w-full text-sm border border-[#e0d8c8] p-2 focus:outline-none focus:border-[#2b4222] bg-[#faf6f0]">
+                <label style="display: block; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 6px; font-weight: 600;">Last Name</label>
+                <input type="text" name="last_name" required
+                       style="width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 10px; font-size: 13px; background: var(--bg-card-alt); transition: all 0.2s;"
+                       onfocus="this.style.borderColor='var(--green-mid)';this.style.boxShadow='0 0 0 3px rgba(58,90,64,0.1)'"
+                       onblur="this.style.borderColor='var(--border)';this.style.boxShadow='none'">
             </div>
         </div>
 
         <div class="grid grid-cols-2 gap-4">
             <div>
-                <label class="block text-[10px] uppercase tracking-wide text-gray-500 mb-1">Username</label>
-                <input type="text" name="username" required class="w-full text-sm border border-[#e0d8c8] p-2 focus:outline-none focus:border-[#2b4222] bg-[#faf6f0]">
+                <label style="display: block; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 6px; font-weight: 600;">Username</label>
+                <input type="text" name="username" required
+                       style="width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 10px; font-size: 13px; background: var(--bg-card-alt); transition: all 0.2s;"
+                       onfocus="this.style.borderColor='var(--green-mid)';this.style.boxShadow='0 0 0 3px rgba(58,90,64,0.1)'"
+                       onblur="this.style.borderColor='var(--border)';this.style.boxShadow='none'">
             </div>
             <div>
-                <label class="block text-[10px] uppercase tracking-wide text-gray-500 mb-1">Email</label>
-                <input type="email" name="email" required class="w-full text-sm border border-[#e0d8c8] p-2 focus:outline-none focus:border-[#2b4222] bg-[#faf6f0]">
+                <label style="display: block; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 6px; font-weight: 600;">Email</label>
+                <input type="email" name="email" required
+                       style="width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 10px; font-size: 13px; background: var(--bg-card-alt); transition: all 0.2s;"
+                       onfocus="this.style.borderColor='var(--green-mid)';this.style.boxShadow='0 0 0 3px rgba(58,90,64,0.1)'"
+                       onblur="this.style.borderColor='var(--border)';this.style.boxShadow='none'">
             </div>
         </div>
 
         <div class="grid grid-cols-2 gap-4">
             <div>
-                <label class="block text-[10px] uppercase tracking-wide text-gray-500 mb-1">Employee ID</label>
-                <input type="text" name="employee_id" required class="w-full text-sm border border-[#e0d8c8] p-2 focus:outline-none focus:border-[#2b4222] bg-[#faf6f0]">
+                <label style="display: block; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 6px; font-weight: 600;">Employee ID</label>
+                <input type="text" name="employee_id" required
+                       style="width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 10px; font-size: 13px; background: var(--bg-card-alt); font-family: monospace; transition: all 0.2s;"
+                       onfocus="this.style.borderColor='var(--green-mid)';this.style.boxShadow='0 0 0 3px rgba(58,90,64,0.1)'"
+                       onblur="this.style.borderColor='var(--border)';this.style.boxShadow='none'">
             </div>
             <div>
-                <label class="block text-[10px] uppercase tracking-wide text-gray-500 mb-1">Temporary Password</label>
-                <input type="password" name="password" required class="w-full text-sm border border-[#e0d8c8] p-2 focus:outline-none focus:border-[#2b4222] bg-[#faf6f0]">
+                <label style="display: block; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 6px; font-weight: 600;">Temporary Password</label>
+                <input type="password" name="password" required
+                       style="width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 10px; font-size: 13px; background: var(--bg-card-alt); transition: all 0.2s;"
+                       onfocus="this.style.borderColor='var(--green-mid)';this.style.boxShadow='0 0 0 3px rgba(58,90,64,0.1)'"
+                       onblur="this.style.borderColor='var(--border)';this.style.boxShadow='none'">
             </div>
         </div>
 
-        <button type="submit" class="mt-4 w-full bg-[#2b4222] text-white py-3 text-sm uppercase tracking-wider font-semibold hover:bg-[#1f3019] transition-colors border border-[#2b4222]">
-            Create Employee Profile
+        <button type="submit" class="btn-cafe btn-cafe-primary" style="width: 100%; justify-content: center; padding: 14px; font-size: 13px; margin-top: 4px; gap: 6px;">
+            <i data-lucide="check" style="width:14px;height:14px;"></i> Create Employee Profile
         </button>
     </form>
 </div>

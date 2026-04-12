@@ -2,116 +2,213 @@
 <html>
 <head>
 
-<title>Login</title>
+<title>Nexus ERP — Login</title>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 <style>
+* { box-sizing: border-box; }
+
 body {
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    height:100vh;
-    background: #faf6f0; /* Paper-like background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(145deg, #1a140e 0%, #2b2118 50%, #3a2f22 100%);
     font-family: 'Inter', sans-serif;
     margin: 0;
+    overflow: hidden;
+    position: relative;
 }
 
-.card {
-    padding:40px;
-    width:380px;
-    border-radius:16px;
-    box-shadow: 0 10px 30px rgba(43, 66, 34, 0.08);
-    background: #fffcf7;
-    border: 1px solid #e0d8c8;
-    animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+/* Floating blurred shapes */
+.orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(100px);
+    opacity: 0.35;
+    z-index: 0;
+    animation: float 8s ease-in-out infinite;
+}
+.orb-1 { top: -15%; left: -10%; width: 500px; height: 500px; background: #3a5a40; }
+.orb-2 { bottom: -20%; right: -10%; width: 600px; height: 600px; background: #8b6f4e; animation-delay: -4s; }
+.orb-3 { top: 40%; left: 60%; width: 300px; height: 300px; background: #588157; animation-delay: -2s; }
+
+@keyframes float {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(30px, -20px) scale(1.05); }
+    66% { transform: translate(-20px, 15px) scale(0.95); }
 }
 
-@keyframes popIn {
-    0% { transform: scale(0.9); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
+/* Glass card */
+.login-card {
+    position: relative;
+    z-index: 10;
+    padding: 48px 44px;
+    width: 440px;
+    border-radius: 24px;
+    background: rgba(255, 252, 247, 0.06);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow:
+        0 32px 64px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    animation: cardUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes cardUp {
+    0% { transform: translateY(50px) scale(0.96); opacity: 0; }
+    100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+/* Brand area */
+.brand-icon {
+    width: 52px;
+    height: 52px;
+    background: linear-gradient(135deg, #3a5a40, #588157);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: white;
+    margin: 0 auto 16px;
+    box-shadow: 0 8px 24px rgba(58, 90, 64, 0.4);
 }
 
 h3 {
     font-family: 'Playfair Display', serif;
     font-weight: 700;
-    color: #2b4222;
-    margin-bottom: 24px !important;
+    color: #f0e6d3;
+    margin-bottom: 4px !important;
+    font-size: 28px;
+    letter-spacing: -0.5px;
+}
+
+p.subtitle {
+    color: rgba(240, 230, 211, 0.5);
+    margin-bottom: 32px;
+    font-size: 14px;
 }
 
 label {
-    font-weight: 500;
-    color: #5c5c5c;
-    font-size: 14px;
-    margin-bottom: 6px;
+    font-weight: 600;
+    color: rgba(240, 230, 211, 0.6);
+    font-size: 11px;
+    margin-bottom: 8px;
     display: block;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .form-control {
-    background: #faf6f0;
-    border: 1px solid #d4cebe;
-    border-radius: 8px;
-    padding: 10px 14px;
-    transition: all 0.3s ease;
-}
-
-.form-control:focus {
-    box-shadow: 0 0 0 3px rgba(244, 162, 97, 0.3);
-    border-color: #f4a261;
-    background: #ffffff;
-    outline: none;
-}
-
-button {
-    width:100%;
-    margin-top: 10px;
-    padding: 10px;
-    font-weight: 600 !important;
-    border-radius: 8px !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 12px !important;
+    padding: 14px 16px !important;
+    color: #f0e6d3 !important;
+    font-size: 14px !important;
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
 }
 
-.btn-primary {
-    background-color: #3a5a40 !important;
-    border-color: #3a5a40 !important;
-    color: white !important;
-    box-shadow: 0 4px 10px rgba(58, 90, 64, 0.3) !important;
+.form-control::placeholder {
+    color: rgba(240, 230, 211, 0.25) !important;
 }
 
-.btn-primary:hover, .btn-primary:focus, .btn-primary:active {
-    background-color: #2b4222 !important;
-    border-color: #2b4222 !important;
+.form-control:focus {
+    box-shadow: 0 0 0 3px rgba(58, 90, 64, 0.25) !important;
+    border-color: rgba(88, 129, 87, 0.5) !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    outline: none !important;
+}
+
+.login-btn {
+    width: 100%;
+    margin-top: 8px;
+    padding: 14px;
+    font-weight: 700 !important;
+    font-size: 14px !important;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    border-radius: 12px !important;
+    background: linear-gradient(135deg, #3a5a40, #588157) !important;
+    border: none !important;
+    color: white !important;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+    box-shadow: 0 8px 24px rgba(58, 90, 64, 0.35) !important;
+}
+
+.login-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(58, 90, 64, 0.4) !important;
+    box-shadow: 0 12px 32px rgba(58, 90, 64, 0.5) !important;
+}
+
+.login-btn:active {
+    transform: translateY(0);
+}
+
+.error-text {
+    background: rgba(192, 57, 43, 0.15);
+    color: #f5a6a0;
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 13px;
+    margin-top: 20px;
+    border: 1px solid rgba(192, 57, 43, 0.2);
+    text-align: center;
+}
+
+.footer-text {
+    text-align: center;
+    margin-top: 24px;
+    font-size: 11px;
+    color: rgba(240, 230, 211, 0.25);
 }
 </style>
-
 </head>
 
 <body>
 
-<div class="card">
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
 
-<h3 class="text-center mb-4">ERP Login</h3>
+<div class="login-card">
+    <div class="text-center">
+        <div class="brand-icon">N</div>
+        <h3>Nexus ERP</h3>
+        <p class="subtitle">Payroll & Attendance Management</p>
+    </div>
 
-<form method="POST">
-{% csrf_token %}
+    <form method="POST">
+        {% csrf_token %}
+        <label>Username</label>
+        <input type="text" name="username" class="form-control mb-4" placeholder="Enter your username" autocomplete="username">
 
-<label>Username</label>
-<input type="text" name="username" class="form-control mb-3">
+        <label>Password</label>
+        <input type="password" name="password" class="form-control mb-4" placeholder="••••••••" autocomplete="current-password">
 
-<label>Password</label>
-<input type="password" name="password" class="form-control mb-3">
+        <button type="submit" class="login-btn">Sign In</button>
+    </form>
 
-<button type="submit" class="btn btn-primary">Login</button>
+    {% if error %}
+    <div class="error-text">{{ error }}</div>
+    {% endif %}
 
-</form>
+    <div style="text-align: center; margin-top: 24px;">
+        <a href="{% url 'demo_index' %}" style="color: rgba(240, 230, 211, 0.7); font-size: 13px; text-decoration: none; border-bottom: 1px solid rgba(240, 230, 211, 0.3); padding-bottom: 2px; transition: all 0.2s;">
+            <i data-lucide="arrow-right" style="width:14px;height:14px;display:inline;"></i> View Interactive Demo Profiles
+        </a>
+    </div>
 
-{% if error %}
-<p style="color:red; margin-top:10px;">{{ error }}</p>
-{% endif %}
-
+    <p class="footer-text" style="display: flex; align-items: center; justify-content: center; gap: 4px;"><i data-lucide="lock" style="width:11px;height:11px;"></i> Secured with SSL encryption</p>
 </div>
 
+<script>if(window.lucide)lucide.createIcons();</script>
 </body>
 </html>

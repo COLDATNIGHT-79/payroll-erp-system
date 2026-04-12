@@ -3,93 +3,239 @@
 {% block content %}
 
 <!-- HEADER -->
-<div class="mb-4 pb-2 border-b border-[#e0d8c8]">
-    <h1 class="text-2xl font-medium tracking-tight text-[#2b4222]">
-        Welcome back, {{ request.user.first_name|default:request.user.username }}
+<div class="mb-6">
+    <h1 style="font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--green-deep); margin-bottom: 4px;">
+        Finance Hub
     </h1>
-    <p class="text-[#5c5c5c] text-xs uppercase tracking-wider mt-1">
-        Finance Operations & Payroll Management Hub
+    <p style="font-size: 13px; color: var(--text-muted);">
+        Welcome back, <strong style="color: var(--green-mid);">{{ request.user.first_name|default:request.user.username }}</strong> — payroll & budget at a glance
     </p>
 </div>
 
-<!-- TOP STATUS -->
-<div class="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-4">
-    <div class="bg-white p-4 border border-[#e0d8c8] rounded-none">
-        <p class="text-xs uppercase tracking-wider text-gray-500 mb-1">Total Payroll Budget</p>
-        <h2 class="text-xl font-semibold text-[#2b4222]">₹ {{ total_budget|floatformat:2 }}</h2>
-    </div>
-    
-    <div class="bg-white p-4 border border-[#e0d8c8] rounded-none">
-        <p class="text-xs uppercase tracking-wider text-gray-500 mb-1">Processed Salaries</p>
-        <h2 class="text-xl font-semibold text-[#2b4222]">{{ processed_salaries }}</h2>
+<!-- STAT CARDS -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div class="stat-card stagger">
+        <div class="stat-label">Total Payroll Budget</div>
+        <div class="stat-value" style="font-size: 22px;">₹ {{ total_budget|floatformat:0 }}</div>
+        <div class="stat-sub">This month's computed</div>
     </div>
 
-    <div class="bg-white p-4 border border-[#e0d8c8] rounded-none">
-        <p class="text-xs uppercase tracking-wider text-gray-500 mb-1">Pending Invoices</p>
-        <h2 class="text-xl font-semibold text-orange-600">0</h2>
+    <div class="stat-card accent-brown stagger">
+        <div class="stat-label">Processed Salaries</div>
+        <div class="stat-value">{{ processed_salaries }}</div>
+        <div class="stat-sub">Employees calculated</div>
     </div>
 
-    <div class="bg-white p-4 border border-[#e0d8c8] rounded-none">
-        <p class="text-xs uppercase tracking-wider text-gray-500 mb-1">Total Deductions</p>
-        <h2 class="text-xl font-semibold text-[#2b4222]">₹ {{ total_deductions|floatformat:2 }}</h2>
+    <div class="stat-card accent-orange stagger">
+        <div class="stat-label">Pending Invoices</div>
+        <div class="stat-value" style="color: var(--accent-orange);">0</div>
+        <div class="stat-sub">All clear</div>
+    </div>
+
+    <div class="stat-card stagger">
+        <div class="stat-label">Deduction Loss</div>
+        <div class="stat-value" style="color: var(--accent-red); font-size: 22px;">₹ {{ total_deductions|floatformat:0 }}</div>
+        <div class="stat-sub">Due to absences</div>
+    </div>
+</div>
+
+<!-- CHARTS ROW -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+    <div class="panel stagger">
+        <div class="panel-title"><span class="dot"></span> Salary Distribution</div>
+        <div class="chart-container">
+            <canvas id="salaryChart"></canvas>
+        </div>
+    </div>
+
+    <div class="panel stagger">
+        <div class="panel-title"><span class="dot" style="background: var(--accent-red);"></span> Budget vs Deductions</div>
+        <div class="chart-container" style="max-height: 240px; display: flex; justify-content: center;">
+            <canvas id="budgetChart"></canvas>
+        </div>
     </div>
 </div>
 
 <!-- PAYROLL ROSTER -->
-<div class="bg-white p-4 border border-[#e0d8c8] rounded-none mb-4">
-    <h2 class="text-sm uppercase tracking-wider text-gray-500 mb-3 border-b border-[#e0d8c8] pb-2">Dynamic Payroll Roster (Current Month)</h2>
-    
-    <table class="w-full text-sm">
-        <thead>
-            <tr class="border-b border-[#e0d8c8] text-[#2b4222] text-xs uppercase tracking-wider">
-                <th class="py-2 text-left font-medium">Employee</th>
-                <th class="py-2 text-left font-medium">Present/Absent</th>
-                <th class="py-2 text-left font-medium">Per Day Rate</th>
-                <th class="py-2 text-right font-medium">Absence Deduction</th>
-                <th class="py-2 text-right font-medium">Final Salary</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for item in payroll_data %}
-            <tr class="border-b border-[#e0d8c8] hover:bg-[#faf6f0] transition-colors">
-                <td class="py-3 font-medium text-gray-700">{{ item.employee.get_full_name|default:item.employee.username }}</td>
-                <td class="py-3 text-gray-600">{{ item.present_days }} / {{ item.absent_days }}</td>
-                <td class="py-3 text-gray-600">₹ {{ item.base|floatformat:2 }}</td>
-                <td class="py-3 text-right font-medium text-red-600">- ₹ {{ item.deduction_loss|floatformat:2 }}</td>
-                <td class="py-3 text-right font-semibold text-[#2b4222]">₹ {{ item.final_salary|floatformat:2 }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div class="panel mb-6 stagger">
+    <div class="panel-title"><i data-lucide="wallet" class="panel-icon"></i> Dynamic Payroll Roster (Current Month)</div>
+    <div style="overflow-x: auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th style="text-align: left;">Employee</th>
+                    <th style="text-align: center;">Present / Absent</th>
+                    <th style="text-align: center;">Per Day Rate</th>
+                    <th style="text-align: right;">Deduction</th>
+                    <th style="text-align: right;">Final Salary</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in payroll_data %}
+                <tr>
+                    <td style="font-weight: 600; color: var(--text-primary);">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div style="width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, var(--green-mid), var(--green-accent)); display: flex; align-items: center; justify-content: center; color: white; font-size: 11px; font-weight: 700; flex-shrink: 0;">
+                                {{ item.employee.username|slice:":2"|upper }}
+                            </div>
+                            {{ item.employee.get_full_name|default:item.employee.username }}
+                        </div>
+                    </td>
+                    <td style="text-align: center; color: var(--text-secondary);">
+                        <span style="color: var(--green-mid); font-weight: 600;">{{ item.present_days }}</span>
+                        <span style="color: var(--text-muted);">/</span>
+                        <span style="color: var(--accent-red); font-weight: 600;">{{ item.absent_days }}</span>
+                    </td>
+                    <td style="text-align: center; color: var(--text-secondary);">₹ {{ item.base|floatformat:0 }}</td>
+                    <td style="text-align: right;">
+                        {% if item.deduction_loss > 0 %}
+                            <span style="color: var(--accent-red); font-weight: 700;">- ₹ {{ item.deduction_loss|floatformat:0 }}</span>
+                        {% else %}
+                            <span style="color: var(--green-mid);">₹ 0</span>
+                        {% endif %}
+                    </td>
+                    <td style="text-align: right; font-weight: 700; color: var(--green-deep); font-size: 14px;">₹ {{ item.final_salary|floatformat:0 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 
+<!-- TRANSACTIONS + TOOLS -->
 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <div class="bg-white p-4 border border-[#e0d8c8] rounded-none">
-        <h2 class="text-sm uppercase tracking-wider text-gray-500 mb-3">Recent Transactions</h2>
-        <ul class="space-y-3 text-sm">
-            <li class="flex justify-between border-b border-[#faf6f0] pb-2">
-                <span class="text-gray-600">Office Supplies Procurement</span>
-                <span class="font-medium text-red-600">- ₹ 5,400</span>
-            </li>
-            <li class="flex justify-between border-b border-[#faf6f0] pb-2">
-                <span class="text-gray-600">Client Payment (Nexus IT)</span>
-                <span class="font-medium text-green-600">+ ₹ 1,20,000</span>
-            </li>
-            <li class="flex justify-between pb-2">
-                <span class="text-gray-600">Software Subscriptions (Annual)</span>
-                <span class="font-medium text-red-600">- ₹ 15,000</span>
-            </li>
-        </ul>
+    <div class="panel stagger">
+        <div class="panel-title"><i data-lucide="arrow-left-right" class="panel-icon"></i> Recent Transactions</div>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border: 1px solid var(--border-light); border-radius: 10px; background: var(--bg-card-alt);">
+                <div>
+                    <p style="font-size: 13px; font-weight: 500; color: var(--text-primary); margin: 0;">Office Supplies Procurement</p>
+                    <p style="font-size: 11px; color: var(--text-muted); margin: 2px 0 0;">Apr 10, 2026</p>
+                </div>
+                <span style="color: var(--accent-red); font-weight: 700; font-size: 14px;">- ₹ 5,400</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border: 1px solid var(--border-light); border-radius: 10px; background: var(--bg-card-alt);">
+                <div>
+                    <p style="font-size: 13px; font-weight: 500; color: var(--text-primary); margin: 0;">Client Payment (Nexus IT)</p>
+                    <p style="font-size: 11px; color: var(--text-muted); margin: 2px 0 0;">Apr 8, 2026</p>
+                </div>
+                <span style="color: var(--green-mid); font-weight: 700; font-size: 14px;">+ ₹ 1,20,000</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border: 1px solid var(--border-light); border-radius: 10px; background: var(--bg-card-alt);">
+                <div>
+                    <p style="font-size: 13px; font-weight: 500; color: var(--text-primary); margin: 0;">Software Subscriptions (Annual)</p>
+                    <p style="font-size: 11px; color: var(--text-muted); margin: 2px 0 0;">Apr 5, 2026</p>
+                </div>
+                <span style="color: var(--accent-red); font-weight: 700; font-size: 14px;">- ₹ 15,000</span>
+            </div>
+        </div>
     </div>
 
-    <div class="bg-white p-4 border border-[#e0d8c8] rounded-none">
-        <h2 class="text-sm uppercase tracking-wider text-gray-500 mb-3">Finance Tools</h2>
-        <div class="flex flex-col gap-2">
-            <button class="border border-[#2b4222] text-[#2b4222] text-xs uppercase tracking-wider py-2 hover:bg-[#2b4222] hover:text-white transition-colors">Run Monthly Payroll</button>
-            <button class="border border-gray-400 text-gray-600 text-xs uppercase tracking-wider py-2 hover:bg-gray-100 transition-colors">Download Tax Reports</button>
-            <button class="border border-gray-400 text-gray-600 text-xs uppercase tracking-wider py-2 hover:bg-gray-100 transition-colors">Audit Logs</button>
+    <div class="panel stagger">
+        <div class="panel-title"><i data-lucide="settings" class="panel-icon"></i> Finance Tools</div>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+            <button class="btn-cafe btn-cafe-primary" style="width: 100%; justify-content: center; gap: 6px;"><i data-lucide="banknote" style="width:14px;height:14px;"></i> Run Monthly Payroll</button>
+            <button class="btn-cafe btn-cafe-outline" style="width: 100%; justify-content: center; gap: 6px;"><i data-lucide="download" style="width:14px;height:14px;"></i> Download Tax Reports</button>
+            <button class="btn-cafe btn-cafe-outline" style="width: 100%; justify-content: center; gap: 6px;"><i data-lucide="scroll-text" style="width:14px;height:14px;"></i> Audit Logs</button>
         </div>
     </div>
 </div>
+
+<!-- CHART DATA (rendered by Django, consumed by JS) -->
+{{ payroll_chart_json|json_script:"payroll-data" }}
+<script id="budget-data" type="application/json">[{{ total_budget|default_if_none:0|floatformat:2 }}, {{ total_deductions|default_if_none:0|floatformat:2 }}]</script>
+
+<!-- CHART SCRIPTS -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Parse server-rendered data
+    var payrollRaw = [];
+    try {
+        payrollRaw = JSON.parse(document.getElementById('payroll-data').textContent);
+    } catch(e) { /* payroll_chart_json not provided, fall back to empty */ }
+
+    var names = [];
+    var salaries = [];
+    var deductions = [];
+    payrollRaw.forEach(function(item) {
+        names.push(item.name);
+        salaries.push(item.salary);
+        deductions.push(item.deduction);
+    });
+
+    var budgetData = JSON.parse(document.getElementById('budget-data').textContent);
+
+    // Salary Bar Chart
+    new Chart(document.getElementById('salaryChart'), {
+        type: 'bar',
+        data: {
+            labels: names.slice(0, 8),
+            datasets: [
+                {
+                    label: 'Final Salary',
+                    data: salaries.slice(0, 8),
+                    backgroundColor: 'rgba(58, 90, 64, 0.7)',
+                    borderRadius: 8,
+                    borderSkipped: false,
+                },
+                {
+                    label: 'Deductions',
+                    data: deductions.slice(0, 8),
+                    backgroundColor: 'rgba(192, 57, 43, 0.5)',
+                    borderRadius: 8,
+                    borderSkipped: false,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: { color: '#6b5e50', font: { size: 11 }, usePointStyle: true, pointStyleWidth: 8, padding: 16 }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(224, 214, 196, 0.4)' },
+                    ticks: { color: '#9b8e7e', font: { size: 11 }, callback: function(v) { return '₹' + v; } }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { color: '#9b8e7e', font: { size: 11 } }
+                }
+            }
+        }
+    });
+
+    // Budget Doughnut
+    new Chart(document.getElementById('budgetChart'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Net Salaries', 'Deductions'],
+            datasets: [{
+                data: budgetData,
+                backgroundColor: ['rgba(58, 90, 64, 0.8)', 'rgba(192, 57, 43, 0.6)'],
+                borderColor: '#fffcf7',
+                borderWidth: 4,
+                hoverOffset: 10,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '70%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { color: '#6b5e50', font: { size: 11 }, padding: 16, usePointStyle: true, pointStyleWidth: 8 }
+                }
+            }
+        }
+    });
+});
+</script>
 
 {% endblock %}
