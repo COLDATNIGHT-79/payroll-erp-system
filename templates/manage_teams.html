@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="mb-6">
+    <h1 style="font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--green-deep); margin-bottom: 4px;">Team Management</h1>
+    <p style="font-size: 13px; color: var(--text-muted);">Configure teams, leaders, and HR oversight</p>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+    <!-- Create Team Form -->
+    <div class="panel col-span-1 lg:col-span-1 stagger">
+        <div class="panel-title"><i data-lucide="network" class="panel-icon"></i> Create New Team</div>
+        <form method="POST" action="{% url 'manage_teams' %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="create_team">
+            
+            <div style="margin-bottom: 12px;">
+                <label style="font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; display: block;">Team Name</label>
+                <input type="text" name="name" class="search-box" style="width: 100%; border-radius: 8px;" placeholder="e.g. Frontend Squad" required>
+            </div>
+            
+            <div style="margin-bottom: 12px;">
+                <label style="font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; display: block;">Assign Team Leader</label>
+                <select name="leader_id" class="search-box" style="width: 100%; border-radius: 8px;">
+                    <option value="">None (Unassigned)</option>
+                    {% for m in managers %}
+                        <option value="{{ m.id }}">{{ m.get_full_name }} ({{ m.username }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div style="margin-bottom: 16px;">
+                <label style="font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; display: block;">Assign HR Representative</label>
+                <select name="hr_id" class="search-box" style="width: 100%; border-radius: 8px;">
+                    <option value="">None (Unassigned)</option>
+                    {% for h in hrs %}
+                        <option value="{{ h.id }}">{{ h.get_full_name }} ({{ h.username }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <button type="submit" class="btn-cafe btn-cafe-primary" style="width: 100%; justify-content: center;">Create Team</button>
+        </form>
+    </div>
+
+    <!-- Assign an Employee to a Team -->
+    <div class="panel col-span-1 lg:col-span-2 stagger">
+        <div class="panel-title"><i data-lucide="user-plus" class="panel-icon"></i> Assign Employee</div>
+        <form method="POST" action="{% url 'manage_teams' %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="assign_team">
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4" style="margin-bottom: 16px;">
+                <div>
+                    <label style="font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; display: block;">Select Employee</label>
+                    <select name="employee_id" class="search-box" style="width: 100%; border-radius: 8px;" required>
+                        <option value="" disabled selected>Select Employee</option>
+                        {% for emp in employees %}
+                            <option value="{{ emp.id }}">{{ emp.get_full_name }} ({{ emp.get_role_display }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label style="font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; display: block;">Select Team</label>
+                    <select name="team_id" class="search-box" style="width: 100%; border-radius: 8px;" required>
+                        <option value="" disabled selected>Select Team</option>
+                        {% for team in teams %}
+                            <option value="{{ team.id }}">{{ team.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn-cafe btn-cafe-primary">Update Assignment</button>
+        </form>
+        
+        <hr style="border: 0; border-top: 1px solid var(--border-light); margin: 24px 0;">
+        
+        <div class="panel-title"><i data-lucide="list-tree" class="panel-icon"></i> Current Teams</div>
+        <table>
+            <thead>
+                <tr>
+                    <th style="text-align: left;">Team Name</th>
+                    <th style="text-align: left;">Leader</th>
+                    <th style="text-align: left;">HR Ops</th>
+                    <th style="text-align: left;">Members</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for team in teams %}
+                <tr>
+                    <td style="font-weight: 600;">{{ team.name }}</td>
+                    <td style="color: var(--text-secondary);">{% if team.leader %}{{ team.leader.get_full_name }}{% else %}<span style="color: var(--text-muted); font-style: italic;">Unassigned</span>{% endif %}</td>
+                    <td style="color: var(--text-secondary);">{% if team.hr %}{{ team.hr.get_full_name }}{% else %}<span style="color: var(--text-muted); font-style: italic;">Unassigned</span>{% endif %}</td>
+                    <td>
+                        <span class="badge-cafe badge-green">{{ team.members.count }}</span>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 32px !important;">No teams created yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

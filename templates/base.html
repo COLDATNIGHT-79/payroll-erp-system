@@ -978,9 +978,17 @@
 
             <!-- EMPLOYEE -->
             {% if request.user.role == 'EMPLOYEE' %}
-            <a href="{% url 'employee_attendance' %}"><i data-lucide="clock" class="nav-icon"></i> My Attendance</a>
-            <a href="#" data-tab="leaves"><i data-lucide="clipboard-list" class="nav-icon"></i> My Leaves</a>
-            <a href="{% url 'employee_assets' %}"><i data-lucide="laptop" class="nav-icon"></i> My Assets</a>
+                {% if demo_mode %}
+                <a href="{% url 'demo_employee_attendance' %}"><i data-lucide="clock" class="nav-icon"></i> My Attendance</a>
+                <a href="{% url 'demo_employee_leaves' %}"><i data-lucide="clipboard-list" class="nav-icon"></i> My Leaves</a>
+                <a href="{% url 'demo_employee_assets' %}"><i data-lucide="laptop" class="nav-icon"></i> My Assets</a>
+                <a href="{% url 'demo_employee_knowledge' %}"><i data-lucide="book-open" class="nav-icon"></i> Knowledge Bank</a>
+                {% else %}
+                <a href="{% url 'employee_attendance' %}"><i data-lucide="clock" class="nav-icon"></i> My Attendance</a>
+                <a href="{% url 'employee_leaves' %}"><i data-lucide="clipboard-list" class="nav-icon"></i> My Leaves</a>
+                <a href="{% url 'employee_assets' %}"><i data-lucide="laptop" class="nav-icon"></i> My Assets</a>
+                <a href="{% url 'employee_knowledge' %}"><i data-lucide="book-open" class="nav-icon"></i> Knowledge Bank</a>
+                {% endif %}
             {% endif %}
 
             <!-- HR / MANAGER -->
@@ -1108,11 +1116,10 @@
             {% endblock %}
         </div>
 
-        <!-- FOOTER -->
         <div class="site-footer">
             <i data-lucide="lock" style="width:12px;height:12px;opacity:0.6;"></i>
             Biometric Security: Fingerprint data is stored as a mathematical template, not an image. Scanner data is
-            sent from the ESP32 via HTTPS encryption.
+            sent from the Raspberry Pi Pico W via HTTPS encryption.
         </div>
 
     </div>
