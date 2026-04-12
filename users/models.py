@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.conf import settings
 
 
 # Company Model
@@ -36,6 +37,13 @@ class Department(models.Model):
     def __str__(self):
         return self.name
 
+class Team(models.Model):
+    name = models.CharField(max_length=100)
+    leader = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='led_teams')
+    hr = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='hr_teams')
+
+    def __str__(self):
+        return self.name
 
 class User(AbstractUser):
 
@@ -66,6 +74,8 @@ class User(AbstractUser):
         null=True,
         blank=True
     )
+    
+    team = models.ForeignKey(Team, on_delete=models.SET_NULL, null=True, blank=True, related_name='members')
 
     def __str__(self):
         return f"{self.username} (Role: {self.get_role_display()})"

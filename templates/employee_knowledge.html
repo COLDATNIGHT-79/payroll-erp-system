@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="mb-6">
+    <h1 style="font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--green-deep); margin-bottom: 4px;">Knowledge Bank</h1>
+    <p style="font-size: 13px; color: var(--text-muted);">Company resources, guides, and policies</p>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for kb in knowledge_links %}
+    <div class="panel stagger" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+        <div>
+            <div class="panel-icon" style="background: var(--bg-body); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+                <i data-lucide="book-check" style="width: 20px; height: 20px; color: var(--green-mid);"></i>
+            </div>
+            <h3 style="font-size: 16px; font-weight: 600; color: var(--green-deep); margin-bottom: 8px;">{{ kb.title }}</h3>
+            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 16px;">Posted {{ kb.created_at|timesince }} ago</p>
+        </div>
+        <a href="{{ kb.url }}" target="_blank" class="btn-cafe btn-cafe-outline" style="width: 100%; justify-content: center; border-color: var(--border-light); color: var(--green-deep);">
+            View Resource <i data-lucide="external-link" style="width: 14px; height: 14px; margin-left: 6px;"></i>
+        </a>
+    </div>
+    {% empty %}
+    <div class="col-span-full panel" style="text-align: left; padding: 48px;">
+        <i data-lucide="books" style="width: 48px; height: 48px; color: var(--text-muted); margin-bottom: 16px; opacity: 0.5;"></i>
+        <h3 style="font-size: 18px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">No Resources Found</h3>
+        <p style="font-size: 14px; color: var(--text-secondary);">Your administrators have not posted any resources to the Knowledge Bank yet.</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

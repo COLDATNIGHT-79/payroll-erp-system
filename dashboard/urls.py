@@ -21,6 +21,9 @@ urlpatterns = [
     path('employees/', views.employee_list, name='employee_list'),
     path('add-employee/', views.add_employee, name='add_employee'),
     path('delete-employee/<int:id>/', views.delete_employee, name='delete_employee'),
+    path('manage-teams/', views.manage_teams, name='manage_teams'),
+    path('my-leaves/', views.employee_leaves, name='employee_leaves'),
+    path('knowledge-bank/', views.employee_knowledge, name='employee_knowledge'),
     path('logout/', views.logout_view, name='logout'),
     
     # 🌟 DEMO DASHBOARDS
@@ -29,5 +32,9 @@ urlpatterns = [
     path('demo/hr/', demo_views.demo_hr, name='demo_hr'),
     path('demo/finance/', demo_views.demo_finance, name='demo_finance'),
     path('demo/employee/', demo_views.demo_employee, name='demo_employee'),
+    path('demo/employee/attendance/', demo_views.demo_employee_attendance, name='demo_employee_attendance'),
+    path('demo/employee/leaves/', demo_views.demo_employee_leaves, name='demo_employee_leaves'),
+    path('demo/employee/assets/', demo_views.demo_employee_assets, name='demo_employee_assets'),
+    path('demo/employee/knowledge/', demo_views.demo_employee_knowledge, name='demo_employee_knowledge'),
     
 ]

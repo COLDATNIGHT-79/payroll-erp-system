@@ -70,6 +70,7 @@
     <div class="panel-title"><i data-lucide="settings" class="panel-icon"></i> Admin Tools</div>
     <div class="flex flex-wrap gap-3">
         <a href="{% url 'employee_list' %}" class="btn-cafe btn-cafe-primary" style="gap: 6px;"><i data-lucide="users" style="width:14px;height:14px;"></i> Manage Global Directory</a>
+        <a href="{% url 'manage_teams' %}" class="btn-cafe btn-cafe-primary" style="gap: 6px; background: linear-gradient(135deg, var(--brown-mid), var(--brown-deep));"><i data-lucide="network" style="width:14px;height:14px;"></i> Manage Teams &amp; HR</a>
         <a href="#" class="btn-cafe btn-cafe-outline" style="gap: 6px;"><i data-lucide="scroll-text" style="width:14px;height:14px;"></i> System Logs</a>
         <a href="#" class="btn-cafe btn-cafe-outline" style="gap: 6px;"><i data-lucide="settings" style="width:14px;height:14px;"></i> Settings</a>
     </div>
@@ -85,7 +86,7 @@
             <input type="text" name="title" placeholder="Announcement Title" class="admin-input" required>
             <textarea name="content" placeholder="Share updates with all employees..." rows="3" class="admin-input" style="resize: vertical;" required></textarea>
             <button type="submit" class="btn-cafe btn-cafe-primary" style="width: 100%; justify-content: center; gap: 6px;">
-                <i data-lucide="send" style="width:14px;height:14px;"></i> Post to Knowledge Bank
+                <i data-lucide="send" style="width:14px;height:14px;"></i> Post Announcement
             </button>
         </form>
     </div>
@@ -105,6 +106,24 @@
             {% endfor %}
         </div>
     </div>
+</div>
+
+<!-- KNOWLEDGE BANK ADDITION -->
+<div class="panel mb-6 stagger">
+    <div class="panel-title"><i data-lucide="book-open" class="panel-icon"></i> Add to Knowledge Bank</div>
+    <form method="POST" action="{% url 'admin_dashboard' %}">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="add_knowledge_link">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <input type="text" name="title" placeholder="Resource Title (e.g. HR Policy 2026)" class="admin-input mb-0" required>
+            <input type="url" name="url" placeholder="Resource URL (e.g. https://...)" class="admin-input mb-0" required>
+        </div>
+        <div class="mt-4">
+            <button type="submit" class="btn-cafe btn-cafe-primary" style="gap: 6px;">
+                <i data-lucide="plus-circle" style="width:14px;height:14px;"></i> Add Resource
+            </button>
+        </div>
+    </form>
 </div>
 
 </div><!-- end tab-overview -->
