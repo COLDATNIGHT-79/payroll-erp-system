@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect
 from django.utils import timezone
 from django.db.models import Sum
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.hashers import make_password
 from django.http import HttpResponseForbidden
 from functools import wraps
 from datetime import datetime, time, timedelta
@@ -10,6 +11,7 @@ from users.models import User
 from attendance.models import Attendance
 from leave.models import Leave
 from payroll.models import Payroll
+from dashboard.models import Announcement
 
 
 # 🔐 ROLE REQUIRED DECORATOR
@@ -76,15 +78,25 @@ def admin_dashboard(request):
     if not request.user.is_authenticated or request.user.role != "ADMIN":
         return HttpResponseForbidden("❌ Access Denied")
 
+    if request.method == "POST":
+        title = request.POST.get("title")
+        content = request.POST.get("content")
+        if title and content:
+            Announcement.objects.create(title=title, content=content, posted_by=request.user)
+            return redirect('admin_dashboard')
+
     today = timezone.now().date()
     total_employees = User.objects.filter(role__iexact='employee').count()
     attendance_today = Attendance.objects.filter(date=today).count()
     leaves_pending = Leave.objects.filter(status__iexact='pending').count()
+    
+    announcements = Announcement.objects.all()[:5]
 
     context = {
         "total_employees": total_employees,
         "attendance_today": attendance_today,
         "leaves_pending": leaves_pending,
+        "announcements": announcements,
     }
 
     return render(request, "admin_dashboard.html", context)
@@ -99,7 +111,21 @@ def hr_dashboard(request):
     week_start = today - timedelta(days=6)
 
     total_employees = User.objects.filter(role__iexact='employee').count()
-    employees = User.objects.filter(role__iexact='employee').order_by('first_name', 'last_name')[:12]
+    employees_qs = User.objects.filter(role__iexact='employee').order_by('first_name', 'last_name')[:12]
+    
+    employee_data = []
+    month_start = today.replace(day=1)
+    for emp in employees_qs:
+        monthly_att = Attendance.objects.filter(employee=emp, date__gte=month_start, date__lte=today)
+        pres_count = monthly_att.filter(status__iexact='present').count()
+        miss_count = monthly_att.filter(status__iexact='miss_punch').count()
+        eff_pres = pres_count + (miss_count * 0.5)
+        percentage = (eff_pres / 22.0) * 100
+        employee_data.append({
+            "user": emp,
+            "attendance_percentage": percentage,
+            "low_attendance": percentage < 70
+        })
     attendance_today = Attendance.objects.filter(date=today).count()
     leaves_pending = Leave.objects.filter(status__iexact='pending').count()
     
@@ -125,7 +151,7 @@ def hr_dashboard(request):
         "total_employees": total_employees,
         "attendance_today": attendance_today,
         "leaves_pending": leaves_pending,
-        "employees": employees,
+        "employees": employee_data,
         "live_feed": live_feed,
         "pending_leave_requests": pending_leave_requests,
         "checkout_alerts": checkout_alerts,
@@ -190,8 +216,19 @@ def finance_dashboard(request):
         total_budget += computed_salary
         total_deductions += loss
 
+    import json
+    payroll_chart_json = json.dumps([
+        {
+            "name": item["employee"].first_name or item["employee"].username,
+            "salary": float(item["final_salary"]),
+            "deduction": float(item["deduction_loss"]),
+        }
+        for item in payroll_data
+    ])
+
     context = {
         "payroll_data": payroll_data,
+        "payroll_chart_json": payroll_chart_json,
         "total_budget": total_budget,
         "total_deductions": total_deductions,
         "processed_salaries": len(payroll_data)
@@ -254,6 +291,8 @@ def employee_dashboard(request):
         {"item": "Charger", "status": "Assigned"},
     ]
 
+    latest_announcement = Announcement.objects.first()
+
     context = {
         "attendance": attendance,
         "attendance_today": attendance_today,
@@ -269,6 +308,7 @@ def employee_dashboard(request):
         "profile_role": user.get_role_display(),
         "profile_id": user.employee_id,
         "profile_department": user.department.name if user.department else "N/A",
+        "latest_announcement": latest_announcement,
     }
 
     return render(request, "employee_dashboard.html", context)
@@ -353,7 +393,6 @@ def employee_list(request):
 
     return render(request, "employee_list.html", context)
 
-from django.contrib.auth.hashers import make_password
 
 def add_employee(request):
 
@@ -374,18 +413,18 @@ def add_employee(request):
             first_name=first_name,
             last_name=last_name,
             role='EMPLOYEE'
- )
+        )
 
         return redirect("employee_list")
 
     return render(request, "add_employee.html")
-def delete_employee(request, id):
 
+
+def delete_employee(request, id):
     emp = User.objects.get(id=id)
     emp.delete()
-
     return redirect("employee_list")
-from django.contrib.auth import logout
+
 
 def logout_view(request):
     logout(request)

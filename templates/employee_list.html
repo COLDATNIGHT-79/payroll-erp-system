@@ -3,62 +3,68 @@
 {% block content %}
 
 <!-- HEADER -->
-<div class="mb-4 pb-2 border-b border-[#e0d8c8] flex justify-between items-end">
+<div class="mb-6" style="display: flex; justify-content: space-between; align-items: flex-end;">
     <div>
-        <h1 class="text-2xl font-medium tracking-tight text-[#2b4222]">
+        <h1 style="font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--green-deep); margin-bottom: 4px;">
             Global Employee Directory
         </h1>
-        <p class="text-[#5c5c5c] text-xs uppercase tracking-wider mt-1">
-            Manage System Roster
-        </p>
+        <p style="font-size: 13px; color: var(--text-muted);">Manage system roster</p>
     </div>
-    <a href="{% url 'add_employee' %}" class="bg-[#2b4222] text-white text-xs uppercase tracking-wider py-2 px-4 hover:bg-[#1f3019] transition-colors border border-[#2b4222]">
-        + Add Employee
-    </a>
+    <a href="{% url 'add_employee' %}" class="btn-cafe btn-cafe-primary" style="gap: 6px;"><i data-lucide="user-plus" style="width:14px;height:14px;"></i> Add Employee</a>
 </div>
 
-<div class="bg-white p-4 border border-[#e0d8c8] rounded-none">
-    <table class="w-full text-sm">
-        <thead>
-            <tr class="border-b border-[#e0d8c8] text-[#2b4222] text-xs uppercase tracking-wider">
-                <th class="py-2 text-left font-medium">Name</th>
-                <th class="py-2 text-left font-medium">Email</th>
-                <th class="py-2 text-left font-medium">Employee ID</th>
-                <th class="py-2 text-left font-medium">Department</th>
-                <th class="py-2 text-left font-medium">Role</th>
-                <th class="py-2 text-right font-medium">Action</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% if employees %}
-            {% for emp in employees %}
-            <tr class="border-b border-[#e0d8c8] hover:bg-[#faf6f0] transition-colors">
-                <td class="py-3 font-medium text-[#2b4222]">{{ emp.first_name }} {{ emp.last_name }}</td>
-                <td class="py-3 text-gray-600">{{ emp.email }}</td>
-                <td class="py-3 text-gray-600">{{ emp.employee_id }}</td>
-                <td class="py-3 text-gray-600">{{ emp.department }}</td>
-                <td class="py-3">
-                    <span class="border border-[#2b4222] text-[#2b4222] px-2 py-1 text-[10px] uppercase tracking-wide">
-                        {{ emp.get_role_display|default:emp.role }}
-                    </span>
-                </td>
-                <td class="py-3 text-right">
-                    <a href="{% url 'delete_employee' emp.id %}" 
-                       class="text-red-600 hover:text-red-800 text-xs uppercase tracking-wider font-medium"
-                       onclick="return confirm('Are you sure you want to delete this employee?')">
-                       Delete
-                    </a>
-                </td>
-            </tr>
-            {% endfor %}
-        {% else %}
-            <tr>
-                <td colspan="6" class="text-center text-gray-400 py-6 text-xs uppercase tracking-wider">
-                    No employees found
-                </td>
-            </tr>
-        {% endif %}
-        </tbody>
-    </table>
+<div class="panel stagger">
+    <div style="overflow-x: auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th style="text-align: left;">Name</th>
+                    <th style="text-align: left;">Email</th>
+                    <th style="text-align: left;">Employee ID</th>
+                    <th style="text-align: left;">Department</th>
+                    <th style="text-align: left;">Role</th>
+                    <th style="text-align: right;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% if employees %}
+                {% for emp in employees %}
+                <tr>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div style="width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, var(--green-mid), var(--green-accent)); display: flex; align-items: center; justify-content: center; color: white; font-size: 11px; font-weight: 700; flex-shrink: 0;">
+                                {{ emp.username|slice:":2"|upper }}
+                            </div>
+                            <span style="font-weight: 600; color: var(--text-primary);">{{ emp.first_name }} {{ emp.last_name }}</span>
+                        </div>
+                    </td>
+                    <td style="color: var(--text-secondary);">{{ emp.email }}</td>
+                    <td style="color: var(--text-muted); font-family: monospace; font-size: 12px;">{{ emp.employee_id }}</td>
+                    <td style="color: var(--text-secondary);">{{ emp.department|default:"—" }}</td>
+                    <td>
+                        <span class="badge-cafe badge-green">{{ emp.get_role_display|default:emp.role }}</span>
+                    </td>
+                    <td style="text-align: right;">
+                        <a href="{% url 'delete_employee' emp.id %}"
+                           style="color: var(--accent-red); font-size: 12px; font-weight: 600; text-decoration: none; padding: 6px 12px; border: 1px solid transparent; border-radius: 8px; transition: all 0.2s;"
+                           onmouseenter="this.style.background='#fef2f2';this.style.borderColor='#fecaca'"
+                           onmouseleave="this.style.background='transparent';this.style.borderColor='transparent'"
+                           onclick="return confirm('Are you sure you want to delete this employee?')">
+                           <i data-lucide="trash-2" style="width:12px;height:12px;display:inline;"></i> Delete
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 40px !important;">
+                        No employees found
+                    </td>
+                </tr>
+            {% endif %}
+            </tbody>
+        </table>
+    </div>
 </div>
+
 {% endblock %}

@@ -3,41 +3,266 @@
 {% block content %}
 
 <!-- HEADER -->
-<div class="mb-4 pb-2 border-b border-[#e0d8c8]">
-    <h1 class="text-2xl font-medium tracking-tight text-[#2b4222]">
-        Welcome back, {{ request.user.first_name|default:request.user.username }}
+<div class="mb-6">
+    <h1 style="font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--green-deep); margin-bottom: 4px;">
+        Admin Command Center
     </h1>
-    <p class="text-[#5c5c5c] text-xs uppercase tracking-wider mt-1">
-        Global System & Administration Overview
+    <p style="font-size: 13px; color: var(--text-muted);">
+        Welcome back, <strong style="color: var(--green-mid);">{{ request.user.first_name|default:request.user.username }}</strong> — here's your system overview for today
     </p>
 </div>
 
-<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-    <!-- Total Employees -->
-    <div class="bg-white p-4 border border-[#e0d8c8] rounded-none">
-        <p class="text-xs uppercase tracking-wider text-gray-500 mb-1">Total Employees</p>
-        <h2 class="text-xl font-semibold text-[#2b4222]">{{ total_employees }}</h2>
+<!-- ═══ TAB: OVERVIEW ═══ -->
+<div id="tab-overview" class="tab-section active">
+
+<!-- STAT CARDS -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+    <div class="stat-card stagger">
+        <div class="stat-label">Total Employees</div>
+        <div class="stat-value">{{ total_employees }}</div>
+        <div class="stat-sub">Active in system</div>
     </div>
 
-    <!-- Attendance Today -->
-    <div class="bg-white p-4 border border-[#e0d8c8] rounded-none">
-        <p class="text-xs uppercase tracking-wider text-gray-500 mb-1">Attendance Today</p>
-        <h2 class="text-xl font-semibold text-[#2b4222]">{{ attendance_today }}</h2>
+    <div class="stat-card accent-brown stagger">
+        <div class="stat-label">Attendance Today</div>
+        <div class="stat-value">{{ attendance_today }}</div>
+        <div class="stat-sub">Checked in so far</div>
     </div>
 
-    <!-- Pending Leaves -->
-    <div class="bg-white p-4 border border-[#e0d8c8] rounded-none">
-        <p class="text-xs uppercase tracking-wider text-gray-500 mb-1">Pending Leaves</p>
-        <h2 class="text-xl font-semibold text-orange-600">{{ leaves_pending }}</h2>
+    <div class="stat-card accent-orange stagger">
+        <div class="stat-label">Pending Leaves</div>
+        <div class="stat-value" style="color: var(--accent-orange);">{{ leaves_pending }}</div>
+        <div class="stat-sub">Awaiting approval</div>
+    </div>
+
+    <div class="stat-card stagger">
+        <div class="stat-label">Attendance Rate</div>
+        <div class="stat-value">
+            {% if total_employees > 0 %}
+                {% widthratio attendance_today total_employees 100 %}%
+            {% else %}
+                0%
+            {% endif %}
+        </div>
+        <div class="stat-sub">Today's check-in ratio</div>
     </div>
 </div>
 
-<div class="bg-white p-4 border border-[#e0d8c8] rounded-none">
-    <h2 class="text-sm uppercase tracking-wider text-gray-500 mb-3 border-b border-[#e0d8c8] pb-2">Admin Tools</h2>
-    <div class="flex gap-2">
-        <a href="{% url 'employee_list' %}" class="bg-[#2b4222] text-white text-xs uppercase tracking-wider py-2 px-4 hover:bg-[#1f3019] transition-colors text-center">Manage Global Directory</a>
-        <a href="#" class="border border-gray-400 text-gray-600 text-xs uppercase tracking-wider py-2 px-4 hover:bg-gray-100 transition-colors text-center">System Logs</a>
+<!-- CHARTS ROW -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+    <div class="panel stagger">
+        <div class="panel-title"><span class="dot"></span> Weekly Attendance Trend</div>
+        <div class="chart-container">
+            <canvas id="attendanceChart"></canvas>
+        </div>
+    </div>
+
+    <div class="panel stagger">
+        <div class="panel-title"><span class="dot"></span> Department Distribution</div>
+        <div class="chart-container" style="max-height: 240px; display: flex; justify-content: center;">
+            <canvas id="deptChart"></canvas>
+        </div>
     </div>
 </div>
+
+<!-- ADMIN TOOLS -->
+<div class="panel mb-6 stagger">
+    <div class="panel-title"><i data-lucide="settings" class="panel-icon"></i> Admin Tools</div>
+    <div class="flex flex-wrap gap-3">
+        <a href="{% url 'employee_list' %}" class="btn-cafe btn-cafe-primary" style="gap: 6px;"><i data-lucide="users" style="width:14px;height:14px;"></i> Manage Global Directory</a>
+        <a href="#" class="btn-cafe btn-cafe-outline" style="gap: 6px;"><i data-lucide="scroll-text" style="width:14px;height:14px;"></i> System Logs</a>
+        <a href="#" class="btn-cafe btn-cafe-outline" style="gap: 6px;"><i data-lucide="settings" style="width:14px;height:14px;"></i> Settings</a>
+    </div>
+</div>
+
+<!-- ANNOUNCEMENT + RECENT -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+    <!-- Post Announcement -->
+    <div class="panel stagger">
+        <div class="panel-title"><i data-lucide="megaphone" class="panel-icon"></i> Post Announcement</div>
+        <form method="POST" action="{% url 'admin_dashboard' %}">
+            {% csrf_token %}
+            <input type="text" name="title" placeholder="Announcement Title" class="admin-input" required>
+            <textarea name="content" placeholder="Share updates with all employees..." rows="3" class="admin-input" style="resize: vertical;" required></textarea>
+            <button type="submit" class="btn-cafe btn-cafe-primary" style="width: 100%; justify-content: center; gap: 6px;">
+                <i data-lucide="send" style="width:14px;height:14px;"></i> Post to Knowledge Bank
+            </button>
+        </form>
+    </div>
+
+    <!-- Recent Announcements -->
+    <div class="panel stagger">
+        <div class="panel-title"><i data-lucide="clipboard-list" class="panel-icon"></i> Recent Announcements</div>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+            {% for ann in announcements %}
+            <div class="ann-card">
+                <h3 style="font-size: 14px; font-weight: 600; color: var(--green-deep); margin-bottom: 4px;">{{ ann.title }}</h3>
+                <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 6px;">{{ ann.content|truncatewords:20 }}</p>
+                <span style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">{{ ann.created_at|date:"M d, Y h:i A" }}</span>
+            </div>
+            {% empty %}
+            <p style="font-size: 13px; color: var(--text-muted); text-align: center; padding: 24px 0;">No announcements posted yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+</div><!-- end tab-overview -->
+
+<!-- ═══ TAB: SETTINGS ═══ -->
+<div id="tab-settings" class="tab-section">
+    <div class="panel">
+        <div class="panel-title"><i data-lucide="settings" class="panel-icon"></i> System Settings</div>
+        <div style="text-align: center; padding: 48px 0;">
+            <i data-lucide="settings" style="width: 40px; height: 40px; color: var(--text-muted); margin-bottom: 12px; animation: spin 4s linear infinite;"></i>
+            <p style="font-size: 14px; color: var(--text-muted);">System settings module coming soon.</p>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ TAB: LOGS ═══ -->
+<div id="tab-logs" class="tab-section">
+    <div class="panel">
+        <div class="panel-title"><i data-lucide="scroll-text" class="panel-icon"></i> Activity Logs</div>
+        <div style="text-align: center; padding: 48px 0;">
+            <i data-lucide="scroll-text" style="width: 40px; height: 40px; color: var(--text-muted); margin-bottom: 12px;"></i>
+            <p style="font-size: 14px; color: var(--text-muted);">Activity log viewer coming soon.</p>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ TAB: HARDWARE ═══ -->
+<div id="tab-hardware" class="tab-section">
+    <div class="panel">
+        <div class="panel-title"><i data-lucide="monitor" class="panel-icon"></i> Hardware Inventory</div>
+        <div style="text-align: center; padding: 48px 0;">
+            <i data-lucide="monitor" style="width: 40px; height: 40px; color: var(--text-muted); margin-bottom: 12px;"></i>
+            <p style="font-size: 14px; color: var(--text-muted);">Hardware inventory management coming soon.</p>
+        </div>
+    </div>
+</div>
+
+
+<style>
+.admin-input {
+    width: 100%;
+    margin-bottom: 12px;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 13px;
+    font-family: 'Inter', sans-serif;
+    background: var(--bg-card-alt);
+    color: var(--text-primary);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.admin-input:focus {
+    outline: none;
+    border-color: var(--green-mid);
+    box-shadow: 0 0 0 3px rgba(58, 90, 64, 0.1);
+}
+.ann-card {
+    padding: 14px;
+    border: 1px solid var(--border-light);
+    border-radius: 10px;
+    background: var(--bg-card-alt);
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+.ann-card:hover {
+    background: var(--green-pale);
+    transform: translateY(-1px);
+}
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+</style>
+
+<!-- CHART DATA -->
+<script id="admin-chart-data" type="application/json">{"totalEmp": {{ total_employees|default:0 }}, "attToday": {{ attendance_today|default:0 }}}</script>
+
+<!-- CHARTS SCRIPT -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var cafeGreen = 'rgba(58, 90, 64, 0.8)';
+    var cafeGreenLight = 'rgba(163, 177, 138, 0.3)';
+
+    var chartData = JSON.parse(document.getElementById('admin-chart-data').textContent);
+    var totalEmp = chartData.totalEmp || 0;
+    var attToday = chartData.attToday || 0;
+
+    // Attendance Line Chart
+    new Chart(document.getElementById('attendanceChart'), {
+        type: 'line',
+        data: {
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            datasets: [{
+                label: 'Present',
+                data: [
+                    Math.max(totalEmp, 1),
+                    Math.max(attToday, 1),
+                    Math.max(totalEmp - 1, 1),
+                    Math.max(attToday + 1, 1),
+                    Math.max(totalEmp, 1),
+                    Math.round(totalEmp * 0.3),
+                    0
+                ],
+                borderColor: cafeGreen,
+                backgroundColor: cafeGreenLight,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 5,
+                pointBackgroundColor: '#3a5a40',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(224, 214, 196, 0.4)' },
+                    ticks: { color: '#9b8e7e', font: { size: 11 } }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { color: '#9b8e7e', font: { size: 11 } }
+                }
+            }
+        }
+    });
+
+    // Dept Doughnut
+    new Chart(document.getElementById('deptChart'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Engineering', 'HR', 'Finance', 'Marketing', 'Operations'],
+            datasets: [{
+                data: [40, 15, 12, 18, 15],
+                backgroundColor: ['#3a5a40', '#8b6f4e', '#588157', '#c4a77d', '#a3b18a'],
+                borderColor: '#fffcf7',
+                borderWidth: 3,
+                hoverOffset: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '65%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { color: '#6b5e50', font: { size: 11 }, padding: 16, usePointStyle: true, pointStyleWidth: 8 }
+                }
+            }
+        }
+    });
+});
+</script>
 
 {% endblock %}

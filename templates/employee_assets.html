@@ -1,39 +1,34 @@
 {% extends "base.html" %}
 
 {% block content %}
+
 <!-- HEADER -->
-<div class="mb-4 pb-2 border-b border-[#e0d8c8]">
-    <h1 class="text-2xl font-medium tracking-tight text-[#2b4222]">
+<div class="mb-6">
+    <h1 style="font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--green-deep); margin-bottom: 4px;">
         My Assets
     </h1>
-    <p class="text-[#5c5c5c] text-xs uppercase tracking-wider mt-1">
-        Hardware Assigned To You
-    </p>
+    <p style="font-size: 13px; color: var(--text-muted);">Hardware assigned to you</p>
 </div>
 
-<div class="bg-white p-6 border border-[#e0d8c8] rounded-none max-w-lg">
-    <h2 class="text-sm uppercase tracking-wider text-gray-500 mb-4 border-b border-[#e0d8c8] pb-2">Hardware Inventory</h2>
-    <table class="w-full text-sm">
-        <thead>
-            <tr class="border-b border-[#e0d8c8] text-[#2b4222] text-xs uppercase tracking-wider">
-                <th class="py-2 text-left font-medium">Asset Details</th>
-                <th class="py-2 text-right font-medium">Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for asset in assets %}
-            <tr class="border-b border-[#e0d8c8] hover:bg-[#faf6f0] transition-colors">
-                <td class="py-3 font-medium text-[#2b4222]">{{ asset.item }}</td>
-                <td class="py-3 text-right">
-                    <span class="border border-[#2b4222] text-[#2b4222] px-2 py-1 text-[10px] uppercase tracking-wide">{{ asset.status }}</span>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="2" class="text-center text-gray-400 py-6 text-xs uppercase tracking-wider">No assets assigned</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div class="panel stagger" style="max-width: 600px;">
+    <div class="panel-title"><i data-lucide="monitor" class="panel-icon"></i> Hardware Inventory</div>
+
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+        {% for asset in assets %}
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px; border: 1px solid var(--border-light); border-radius: 10px; background: var(--bg-card-alt); transition: all 0.2s;" onmouseenter="this.style.transform='translateX(4px)';this.style.borderColor='var(--green-accent)'" onmouseleave="this.style.transform='translateX(0)';this.style.borderColor='var(--border-light)'">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <span style="width: 36px; height: 36px; border-radius: 10px; background: var(--green-pale); display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><i data-lucide="laptop" style="width:16px;height:16px;color:var(--green-mid);"></i></span>
+                <span style="font-size: 14px; font-weight: 600; color: var(--green-deep);">{{ asset.item }}</span>
+            </div>
+            <span class="badge-cafe badge-green">{{ asset.status }}</span>
+        </div>
+        {% empty %}
+        <div style="text-align: center; padding: 40px 0;">
+            <span style="display: flex; justify-content: center; margin-bottom: 8px;"><i data-lucide="package" style="width:32px;height:32px;color:var(--text-muted);"></i></span>
+            <p style="font-size: 13px; color: var(--text-muted);">No assets assigned to you yet</p>
+        </div>
+        {% endfor %}
+    </div>
 </div>
+
 {% endblock %}
