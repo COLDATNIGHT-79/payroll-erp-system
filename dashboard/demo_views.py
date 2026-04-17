@@ -167,6 +167,65 @@ def demo_employee(request):
     }
     return render(request, "employee_dashboard.html", context)
 
+# ─────────────────────────────────────────
+# EMPLOYEE SUB-ROUTES FOR DEMO
+# ─────────────────────────────────────────
+
+def demo_employee_attendance(request):
+    _inject_demo_user(request, "EMPLOYEE", name="Riya")
+    
+    mock_attendance = [
+        {"date": "Apr 11, 2026", "check_in": "09:00 AM", "check_out": "05:00 PM", "status": "PRESENT", "get_status_display": "Present"},
+        {"date": "Apr 10, 2026", "check_in": "08:55 AM", "check_out": "05:15 PM", "status": "PRESENT", "get_status_display": "Present"},
+        {"date": "Apr 09, 2026", "check_in": "09:10 AM", "check_out": "--", "status": "MISS_PUNCH", "get_status_display": "Miss Punch"},
+    ]
+    return render(request, "employee_attendance.html", {"demo_mode": True, "attendance_records": mock_attendance})
+
+def demo_employee_leaves(request):
+    _inject_demo_user(request, "EMPLOYEE", name="Riya")
+    
+    from datetime import date
+    
+    class MockLeave:
+        def __init__(self, type_display, s_date, e_date, applied, status):
+            self._type_display = type_display
+            self.start_date = s_date
+            self.end_date = e_date
+            self.applied_at = applied
+            self.status = status
+            
+        def get_leave_type_display(self):
+            return self._type_display
+
+    mock_leaves = [
+        MockLeave("Annual Leave", date(2026, 5, 1), date(2026, 5, 5), date(2026, 4, 1), "APPROVED"),
+        MockLeave("Sick Leave", date(2026, 3, 15), date(2026, 3, 16), date(2026, 3, 14), "APPROVED"),
+        MockLeave("Casual Leave", date(2026, 4, 20), date(2026, 4, 21), date(2026, 4, 10), "PENDING"),
+    ]
+    return render(request, "employee_leaves.html", {"demo_mode": True, "leaves": mock_leaves})
+
+def demo_employee_assets(request):
+    _inject_demo_user(request, "EMPLOYEE", name="Riya")
+    return render(request, "employee_assets.html", {"demo_mode": True})
+
+def demo_employee_knowledge(request):
+    _inject_demo_user(request, "EMPLOYEE", name="Riya")
+    
+    from datetime import datetime, timedelta
+    
+    class MockKB:
+        def __init__(self, title, url, days_ago):
+            self.title = title
+            self.url = url
+            self.created_at = datetime.now() - timedelta(days=days_ago)
+
+    mock_kb = [
+        MockKB("Employee Onboarding Guide", "#", 10),
+        MockKB("Health & Safety Protocol", "#", 45),
+        MockKB("2026 HR Policies", "#", 100),
+    ]
+    return render(request, "employee_knowledge.html", {"demo_mode": True, "knowledge_links": mock_kb})
+
 
 # ─────────────────────────────────────────
 # FINANCE

@@ -30,18 +30,12 @@
     </p>
 </div>
 
-<!-- STAT CARDS (3 columns — salary removed) -->
-<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+<!-- STAT CARDS (2 columns) -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
     <div class="stat-card accent-brown stagger">
         <div class="stat-label">Monthly Presence</div>
         <div class="stat-value">{{ days_present }}</div>
         <div class="stat-sub">Days present / 22</div>
-    </div>
-
-    <div class="stat-card accent-orange stagger">
-        <div class="stat-label">Pending Leaves</div>
-        <div class="stat-value" style="color: var(--accent-orange);">{{ leaves_pending }}</div>
-        <div class="stat-sub">Awaiting approval</div>
     </div>
 
     <div class="stat-card stagger">

@@ -11,7 +11,8 @@ from users.models import User
 from attendance.models import Attendance
 from leave.models import Leave
 from payroll.models import Payroll
-from dashboard.models import Announcement
+from dashboard.models import Announcement, KnowledgeBank
+from users.models import User, Team
 
 
 # 🔐 ROLE REQUIRED DECORATOR
@@ -80,11 +81,18 @@ def admin_dashboard(request):
         return HttpResponseForbidden("❌ Access Denied")
 
     if request.method == "POST":
-        title = request.POST.get("title")
-        content = request.POST.get("content")
-        if title and content:
-            Announcement.objects.create(title=title, content=content, posted_by=request.user)
-            return redirect('admin_dashboard')
+        action = request.POST.get("action")
+        if action == "add_knowledge_link":
+            title = request.POST.get("title")
+            url = request.POST.get("url")
+            if title and url:
+                KnowledgeBank.objects.create(title=title, url=url)
+        else:
+            title = request.POST.get("title")
+            content = request.POST.get("content")
+            if title and content:
+                Announcement.objects.create(title=title, content=content, posted_by=request.user)
+        return redirect('admin_dashboard')
 
     today = timezone.now().date()
     total_employees = User.objects.filter(role__iexact='employee').count()
@@ -252,7 +260,6 @@ def employee_dashboard(request):
     monthly_attendance = Attendance.objects.filter(employee=user, date__gte=month_start, date__lte=today)
 
     attendance_today = Attendance.objects.filter(employee=user, date=today).count()
-    leaves_pending = Leave.objects.filter(employee=user, status__iexact='pending').count()
 
     present_count = monthly_attendance.filter(status__iexact='present').count()
     miss_punch_count = monthly_attendance.filter(status__iexact='miss_punch').count()
@@ -280,11 +287,7 @@ def employee_dashboard(request):
     if latest_record and latest_record.check_in:
         recent_activity = f"You checked in at {latest_record.check_in.strftime('%I:%M %p')} via Scanner ID #1."
 
-    knowledge_links = [
-        {"title": "Project Onboarding Guide", "url": "#"},
-        {"title": "Company HR Policies", "url": "#"},
-        {"title": "Scanner Troubleshooting", "url": "#"},
-    ]
+    knowledge_links = KnowledgeBank.objects.all()[:5]
 
     assets = [
         {"item": "Asus Vivobook", "status": "Assigned"},
@@ -297,7 +300,6 @@ def employee_dashboard(request):
     context = {
         "attendance": attendance,
         "attendance_today": attendance_today,
-        "leaves_pending": leaves_pending,
         "payroll_total": current_month_salary,
         "daily_stats": daily_stats,
         "days_present": days_present,
@@ -428,6 +430,73 @@ def delete_employee(request, id):
     emp.delete()
     return redirect("employee_list")
 
+
+def employee_leaves(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+        
+    if request.method == "POST":
+        leave_type = request.POST.get("leave_type")
+        start_date = request.POST.get("start_date")
+        end_date = request.POST.get("end_date")
+        reason = request.POST.get("reason")
+        if leave_type and start_date and end_date:
+            Leave.objects.create(
+                employee=request.user,
+                leave_type=leave_type,
+                start_date=start_date,
+                end_date=end_date,
+                reason=reason
+            )
+            return redirect('employee_leaves')
+            
+    leaves = Leave.objects.filter(employee=request.user).order_by('-applied_at')
+    return render(request, "employee_leaves.html", {"leaves": leaves})
+
+def manage_teams(request):
+    if not request.user.is_authenticated or request.user.role != "ADMIN":
+        return HttpResponseForbidden("❌ Access Denied")
+        
+    if request.method == "POST":
+        if request.POST.get("action") == "create_team":
+            name = request.POST.get("name")
+            leader_id = request.POST.get("leader_id")
+            hr_id = request.POST.get("hr_id")
+            
+            leader = User.objects.get(id=leader_id) if leader_id else None
+            hr = User.objects.get(id=hr_id) if hr_id else None
+            
+            Team.objects.create(name=name, leader=leader, hr=hr)
+            return redirect('manage_teams')
+            
+        elif request.POST.get("action") == "assign_team":
+            employee_id = request.POST.get("employee_id")
+            team_id = request.POST.get("team_id")
+            if employee_id and team_id:
+                emp = User.objects.get(id=employee_id)
+                team = Team.objects.get(id=team_id)
+                emp.team = team
+                emp.save()
+            return redirect('manage_teams')
+            
+    teams = Team.objects.all()
+    employees = User.objects.exclude(role="ADMIN")
+    managers = User.objects.filter(role__in=["MANAGER", "HR"])
+    hrs = User.objects.filter(role="HR")
+    
+    context = {
+        "teams": teams,
+        "employees": employees,
+        "managers": managers,
+        "hrs": hrs
+    }
+    return render(request, "manage_teams.html", context)
+
+def employee_knowledge(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    knowledge_links = KnowledgeBank.objects.all()
+    return render(request, "employee_knowledge.html", {"knowledge_links": knowledge_links})
 
 def logout_view(request):
     logout(request)
