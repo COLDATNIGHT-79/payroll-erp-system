@@ -2,23 +2,7 @@
 
 {% block content %}
 
-<!-- ANNOUNCEMENT TOAST -->
-{% if latest_announcement %}
-<div id="announcement-toast" style="position: fixed; top: 20px; right: 20px; max-width: 380px; z-index: 100; background: var(--bg-card-solid); border: 1px solid var(--border); border-left: 5px solid var(--green-mid); border-radius: 14px; padding: 20px; box-shadow: 0 16px 48px rgba(0,0,0,0.12); transform: translateX(120%); animation: toastSlide 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.8s;">
-    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-        <span class="badge-cafe badge-green" style="display: flex; align-items: center; gap: 4px;"><i data-lucide="megaphone" style="width:12px;height:12px;"></i> New Announcement</span>
-        <button onclick="document.getElementById('announcement-toast').style.display='none'" style="background: none; border: none; cursor: pointer; font-size: 18px; color: var(--text-muted); line-height: 1;">&times;</button>
-    </div>
-    <p style="font-size: 14px; font-weight: 600; color: var(--green-deep); margin-bottom: 4px;">{{ latest_announcement.title }}</p>
-    <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">{{ latest_announcement.content|truncatewords:25 }}</p>
-    <span style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">{{ latest_announcement.created_at|date:"M d, Y h:i A" }}</span>
-</div>
-<style>
-@keyframes toastSlide {
-    to { transform: translateX(0); }
-}
-</style>
-{% endif %}
+
 
 <!-- HEADER -->
 <div class="mb-6">
@@ -44,26 +28,44 @@
     </div>
 </div>
 
-<!-- CHART + KNOWLEDGE BANK -->
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+<!-- CHART + KNOWLEDGE BANK + ANNOUNCEMENTS -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
 
     <!-- Attendance Chart -->
-    <div class="panel stagger">
+    <div class="panel stagger lg:col-span-1">
         <div class="panel-title"><span class="dot"></span> My Attendance This Week</div>
         <div class="chart-container">
             <canvas id="empAttendanceChart"></canvas>
+        </div>
+    </div>
+    
+    <!-- Notice Board -->
+    <div class="panel stagger">
+        <div class="panel-title"><i data-lucide="clipboard-list" class="panel-icon"></i> Notice Board</div>
+        <div style="display: flex; flex-direction: column; gap: 12px; max-height: 240px; overflow-y: auto; padding-right: 4px;">
+            {% for ann in announcements %}
+            <div class="ann-card" style="padding: 12px; border: 1px solid var(--border-light); border-radius: 10px; background: var(--bg-card-alt);">
+                <h3 style="font-size: 13px; font-weight: 600; color: var(--green-deep); margin-bottom: 2px;">{{ ann.title }}</h3>
+                <p style="font-size: 11px; color: var(--text-secondary); margin-bottom: 4px;">{{ ann.content }}</p>
+                <span style="font-size: 9px; color: var(--text-muted); text-transform: uppercase;">{{ ann.created_at|date:"M d, Y" }}</span>
+            </div>
+            {% empty %}
+            <p style="font-size: 12px; color: var(--text-muted); text-align: center; padding: 12px 0;">No announcements.</p>
+            {% endfor %}
         </div>
     </div>
 
     <!-- Knowledge Bank -->
     <div class="panel stagger">
         <div class="panel-title"><i data-lucide="book-open" class="panel-icon"></i> Knowledge Bank</div>
-        <div style="display: flex; flex-direction: column; gap: 10px;">
+        <div style="display: flex; flex-direction: column; gap: 10px; max-height: 240px; overflow-y: auto;">
             {% for item in knowledge_links %}
             <a href="{{ item.url }}" style="display: flex; align-items: center; gap: 12px; padding: 14px; border: 1px solid var(--border-light); border-radius: 10px; background: var(--bg-card-alt); text-decoration: none; transition: all 0.2s;" onmouseenter="this.style.transform='translateX(6px)';this.style.borderColor='var(--green-accent)'" onmouseleave="this.style.transform='translateX(0)';this.style.borderColor='var(--border-light)'">
                 <span style="width: 36px; height: 36px; border-radius: 10px; background: var(--green-pale); display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><i data-lucide="file-text" style="width:16px;height:16px;color:var(--green-mid);"></i></span>
                 <span style="font-size: 13px; font-weight: 600; color: var(--green-deep);">{{ item.title }}</span>
             </a>
+            {% empty %}
+            <p style="font-size: 12px; color: var(--text-muted); text-align: center; padding: 12px 0;">No documents found.</p>
             {% endfor %}
         </div>
     </div>
@@ -86,7 +88,7 @@
             <h2 style="font-size: 16px; font-weight: 700; color: var(--green-deep); margin-bottom: 2px;">My Attendance</h2>
             <p style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">Latest records</p>
         </div>
-        <a href="#calendar" class="btn-cafe btn-cafe-outline" style="padding: 6px 14px; font-size: 11px;">View Calendar ↓</a>
+        <a href="{% url 'employee_attendance' %}" class="btn-cafe btn-cafe-outline" style="padding: 6px 14px; font-size: 11px;">View All</a>
     </div>
 
     <table>
@@ -129,62 +131,20 @@
     </table>
 </div>
 
-<!-- LIVE CALENDAR -->
-<div id="calendar" class="panel mt-4 stagger">
-    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; margin-bottom: 16px; gap: 12px;">
-        <div>
-            <h2 style="font-size: 16px; font-weight: 700; color: var(--green-deep); margin-bottom: 2px;">Live Attendance Calendar</h2>
-            <p style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">Current month overview</p>
-        </div>
-        <div style="display: flex; align-items: center; gap: 16px; font-size: 11px; color: var(--text-muted);">
-            <span style="display: flex; align-items: center; gap: 4px;"><span style="width: 10px; height: 10px; border-radius: 4px; background: var(--green-pale); border: 1px solid var(--green-accent);"></span> Present</span>
-            <span style="display: flex; align-items: center; gap: 4px;"><span style="width: 10px; height: 10px; border-radius: 4px; background: #fef3c7; border: 1px solid #f59e0b;"></span> Late</span>
-            <span style="display: flex; align-items: center; gap: 4px;"><span style="width: 10px; height: 10px; border-radius: 4px; background: #fef2f2; border: 1px solid #ef4444;"></span> Absent</span>
-            <span style="display: flex; align-items: center; gap: 4px;"><span style="width: 10px; height: 10px; border-radius: 4px; background: #eff6ff; border: 1px solid #60a5fa;"></span> Holiday</span>
-        </div>
-    </div>
 
-    <div class="grid grid-cols-7 gap-2" style="margin-bottom: 8px;">
-        <span style="text-align: center; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); font-weight: 600;">Sun</span>
-        <span style="text-align: center; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); font-weight: 600;">Mon</span>
-        <span style="text-align: center; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); font-weight: 600;">Tue</span>
-        <span style="text-align: center; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); font-weight: 600;">Wed</span>
-        <span style="text-align: center; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); font-weight: 600;">Thu</span>
-        <span style="text-align: center; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); font-weight: 600;">Fri</span>
-        <span style="text-align: center; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); font-weight: 600;">Sat</span>
-    </div>
-
-    <style>
-        .cal-day {
-            border: 1px solid var(--border-light); border-radius: 8px;
-            padding: 12px 4px; transition: all 0.2s;
-        }
-        .cal-day:hover { transform: scale(1.05); }
-        .cal-day-present { background: var(--green-pale); color: var(--green-deep); }
-        .cal-day-late    { background: #fef3c7; color: #92400e; }
-        .cal-day-absent  { background: #fef2f2; color: #991b1b; }
-        .cal-day-other   { background: #eff6ff; color: #1e40af; }
-    </style>
-    <div class="grid grid-cols-7 gap-2 text-center text-sm">
-        {% for day in calendar_days %}
-            <div class="cal-day {% if day.status == 'present' %}cal-day-present{% elif day.status == 'late' %}cal-day-late{% elif day.status == 'absent' %}cal-day-absent{% else %}cal-day-other{% endif %}">
-                <span style="display: block; font-weight: 700; font-size: 14px;">{{ day.day }}</span>
-                <span style="display: block; font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px;">{{ day.status }}</span>
-            </div>
-        {% endfor %}
-    </div>
-</div>
 
 <!-- CHART SCRIPT -->
+<script id="emp-chart-data" type="application/json">{{ weekly_hours_json|safe }}</script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    var weeklyHours = JSON.parse(document.getElementById('emp-chart-data').textContent || '[]');
     new Chart(document.getElementById('empAttendanceChart'), {
         type: 'line',
         data: {
             labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
             datasets: [{
                 label: 'Hours',
-                data: [8.5, 9, 7.5, 8, 8.5, 4, 0],
+                data: weeklyHours.length ? weeklyHours : [0,0,0,0,0,0,0],
                 borderColor: 'rgba(58, 90, 64, 0.9)',
                 backgroundColor: 'rgba(163, 177, 138, 0.2)',
                 fill: true,

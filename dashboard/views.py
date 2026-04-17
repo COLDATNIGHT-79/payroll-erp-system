@@ -95,16 +95,29 @@ def admin_dashboard(request):
 
     today = timezone.now().date()
     total_employees = User.objects.filter(role__iexact='employee').count()
-    attendance_today = Attendance.objects.filter(date=today).count()
+    attendance_today = Attendance.objects.filter(date=today, status__in=['PRESENT', 'LATE']).count()
     leaves_pending = Leave.objects.filter(status__iexact='pending').count()
     
-    announcements = Announcement.objects.all()[:5]
+    # Calculate weekly attendance trend (Mon-Sun of current week)
+    week_start = today - timedelta(days=today.weekday())
+    weekly_attendance = []
+    for i in range(7):
+        day = week_start + timedelta(days=i)
+        if day > today:
+            weekly_attendance.append(0)
+        else:
+            weekly_attendance.append(Attendance.objects.filter(date=day, status__in=['PRESENT', 'LATE']).count())
+    import json
+    weekly_attendance_json = json.dumps(weekly_attendance)
+
+    announcements = Announcement.objects.all().order_by('-created_at')[:5]
 
     context = {
         "total_employees": total_employees,
         "attendance_today": attendance_today,
         "leaves_pending": leaves_pending,
         "announcements": announcements,
+        "weekly_attendance_json": weekly_attendance_json,
     }
 
     return render(request, "admin_dashboard.html", context)
@@ -147,6 +160,17 @@ def hr_dashboard(request):
     for record in week_records:
         total_seconds += (datetime.combine(record.date, record.check_out) - datetime.combine(record.date, record.check_in)).seconds
 
+    # Calculate weekly attendance trend (Mon-Sun of current week)
+    weekly_attendance = []
+    for i in range(7):
+        day = week_start + timedelta(days=i)
+        if day > today:
+            weekly_attendance.append(0)
+        else:
+            weekly_attendance.append(Attendance.objects.filter(date=day, status__in=['PRESENT', 'LATE']).count())
+    import json
+    weekly_attendance_json = json.dumps(weekly_attendance)
+
     avg_hours = round((total_seconds / week_records.count() / 3600), 1) if week_records.exists() else 0
 
     hardware_inventory = [
@@ -166,6 +190,7 @@ def hr_dashboard(request):
         "late_arrivals": late_arrivals,
         "avg_hours": avg_hours,
         "hardware_inventory": hardware_inventory,
+        "weekly_attendance_json": weekly_attendance_json,
     }
 
     return render(request, "hr_dashboard.html", context)
@@ -270,6 +295,22 @@ def employee_dashboard(request):
     per_day = user.per_day_salary or 0
     current_month_salary = float(effective_present_days) * float(per_day)
 
+    # Calculate actual hours worked for the last 7 days (Mon-Sun of current week)
+    week_start = today - timedelta(days=today.weekday())
+    weekly_hours = []
+    for i in range(7):
+        day = week_start + timedelta(days=i)
+        if day > today:
+            weekly_hours.append(0)
+        else:
+            day_records = Attendance.objects.filter(employee=user, date=day, check_in__isnull=False, check_out__isnull=False)
+            total_sec = 0
+            for r in day_records:
+                total_sec += (datetime.combine(r.date, r.check_out) - datetime.combine(r.date, r.check_in)).seconds
+            weekly_hours.append(round(total_sec / 3600, 1))
+    import json
+    weekly_hours_json = json.dumps(weekly_hours)
+            
     latest_record = Attendance.objects.filter(employee=user).order_by('-date', '-created_at').first()
     if latest_record and latest_record.check_in:
         if latest_record.check_out:
@@ -294,7 +335,7 @@ def employee_dashboard(request):
         {"item": "Charger", "status": "Assigned"},
     ]
 
-    latest_announcement = Announcement.objects.first()
+    announcements = Announcement.objects.all().order_by('-created_at')
 
     context = {
         "attendance": attendance,
@@ -310,7 +351,8 @@ def employee_dashboard(request):
         "profile_role": user.get_role_display(),
         "profile_id": user.employee_id,
         "profile_department": user.department.name if user.department else "N/A",
-        "latest_announcement": latest_announcement,
+        "announcements": announcements,
+        "weekly_hours_json": weekly_hours_json,
     }
 
     return render(request, "employee_dashboard.html", context)

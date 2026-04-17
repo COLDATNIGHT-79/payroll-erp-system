@@ -31,7 +31,7 @@
         <div class="stat-sub">Checked in</div>
     </div>
 
-    <div class="stat-card accent-orange stagger">
+    <div class="stat-card accent-orange stagger" style="cursor: pointer;" onclick="window.location.href='{% url \'employee_leaves\' %}'">
         <div class="stat-label">Pending Requests</div>
         <div class="stat-value" style="color: var(--accent-orange);">{{ leaves_pending }}</div>
         <div class="stat-sub">Leave requests</div>
@@ -264,19 +264,19 @@
 
 
 <!-- CHART DATA -->
-<script id="hr-chart-data" type="application/json">{"employees": {{ total_employees|default:10 }}, "today": {{ attendance_today|default:8 }}}</script>
+<script id="hr-chart-data" type="application/json">{{ weekly_attendance_json|safe }}</script>
 
 <!-- CHART SCRIPTS -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    var d = JSON.parse(document.getElementById('hr-chart-data').textContent);
+    var weeklyAttendance = JSON.parse(document.getElementById('hr-chart-data').textContent || '[]');
     new Chart(document.getElementById('hrAttendanceChart'), {
         type: 'bar',
         data: {
             labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
             datasets: [{
                 label: 'Check-ins',
-                data: [d.employees, d.today, d.employees, d.today, d.employees, 3, 0],
+                data: weeklyAttendance.length ? weeklyAttendance : [0,0,0,0,0,0,0],
                 backgroundColor: [
                     'rgba(58, 90, 64, 0.7)', 'rgba(88, 129, 87, 0.7)', 'rgba(58, 90, 64, 0.7)',
                     'rgba(88, 129, 87, 0.7)', 'rgba(58, 90, 64, 0.7)', 'rgba(196, 167, 125, 0.5)', 'rgba(196, 167, 125, 0.3)'

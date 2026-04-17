@@ -29,7 +29,7 @@
         <div class="stat-sub">Checked in so far</div>
     </div>
 
-    <div class="stat-card accent-orange stagger">
+    <div class="stat-card accent-orange stagger" style="cursor: pointer;" onclick="window.location.href='{% url \'employee_leaves\' %}'">
         <div class="stat-label">Pending Leaves</div>
         <div class="stat-value" style="color: var(--accent-orange);">{{ leaves_pending }}</div>
         <div class="stat-sub">Awaiting approval</div>
@@ -198,7 +198,7 @@
 </style>
 
 <!-- CHART DATA -->
-<script id="admin-chart-data" type="application/json">{"totalEmp": {{ total_employees|default:0 }}, "attToday": {{ attendance_today|default:0 }}}</script>
+<script id="admin-chart-data" type="application/json">{{ weekly_attendance_json|safe }}</script>
 
 <!-- CHARTS SCRIPT -->
 <script>
@@ -206,9 +206,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var cafeGreen = 'rgba(58, 90, 64, 0.8)';
     var cafeGreenLight = 'rgba(163, 177, 138, 0.3)';
 
-    var chartData = JSON.parse(document.getElementById('admin-chart-data').textContent);
-    var totalEmp = chartData.totalEmp || 0;
-    var attToday = chartData.attToday || 0;
+    var weeklyAttendance = JSON.parse(document.getElementById('admin-chart-data').textContent || '[]');
 
     // Attendance Line Chart
     new Chart(document.getElementById('attendanceChart'), {
@@ -217,15 +215,7 @@ document.addEventListener('DOMContentLoaded', function() {
             labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
             datasets: [{
                 label: 'Present',
-                data: [
-                    Math.max(totalEmp, 1),
-                    Math.max(attToday, 1),
-                    Math.max(totalEmp - 1, 1),
-                    Math.max(attToday + 1, 1),
-                    Math.max(totalEmp, 1),
-                    Math.round(totalEmp * 0.3),
-                    0
-                ],
+                data: weeklyAttendance.length ? weeklyAttendance : [0,0,0,0,0,0,0],
                 borderColor: cafeGreen,
                 backgroundColor: cafeGreenLight,
                 fill: true,

@@ -1088,8 +1088,7 @@
 
                 {% if request.user.is_authenticated %}
                 <div class="profile" onclick="toggleDropdown2()">
-                    <span style="font-size: 13px; font-weight: 500;">{{
-                        request.user.first_name|default:request.user.username }}</span>
+                    <span style="font-size: 13px; font-weight: 500;">{{ request.user.first_name|default:request.user.username }}</span>
                     <div class="avatar">
                         {{ request.user.username|slice:":2"|upper }}
                     </div>
