@@ -993,8 +993,7 @@
 
             <!-- HR / MANAGER -->
             {% if request.user.role == 'HR' or request.user.role == 'MANAGER' %}
-            <div class="sidebar-label">People</div>
-            <a href="{% url 'employee_list' %}"><i data-lucide="users" class="nav-icon"></i> Employee Roster</a>
+            <div class="sidebar-label">HR Workspace</div>
             <a href="#" data-tab="leave-approvals"><i data-lucide="check-circle" class="nav-icon"></i> Leave
                 Approvals</a>
             <a href="#" data-tab="live-dashboard"><i data-lucide="radio" class="nav-icon"></i> Live Dashboard</a>
@@ -1002,8 +1001,9 @@
 
             <!-- ADMIN -->
             {% if request.user.role == 'ADMIN' %}
-            <div class="sidebar-label">Administration</div>
+            <div class="sidebar-label">People</div>
             <a href="{% url 'employee_list' %}"><i data-lucide="users" class="nav-icon"></i> Global Directory</a>
+            <div class="sidebar-label">Administration</div>
             <a href="#" data-tab="settings"><i data-lucide="settings" class="nav-icon"></i> System Settings</a>
             <a href="#" data-tab="logs"><i data-lucide="scroll-text" class="nav-icon"></i> Activity Logs</a>
             <a href="#" data-tab="hardware"><i data-lucide="monitor" class="nav-icon"></i> Hardware Inventory</a>
