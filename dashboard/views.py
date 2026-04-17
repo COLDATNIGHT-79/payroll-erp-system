@@ -60,14 +60,15 @@ def dashboard_redirect(request):
         return redirect('login')
 
     user = request.user
+    role = str(user.role).upper()
 
-    if user.role == "ADMIN":
+    if role == "ADMIN":
         return redirect("admin_dashboard")
-    elif user.role == "HR":
+    elif role == "HR":
         return redirect("hr_dashboard")
-    elif user.role == "FINANCE":
+    elif role == "FINANCE":
         return redirect("finance_dashboard")
-    elif user.role == "MANAGER":
+    elif role == "MANAGER":
         return redirect("manager_dashboard")
     else:
         return redirect("employee_dashboard")
@@ -75,7 +76,7 @@ def dashboard_redirect(request):
 
 # 👑 ADMIN DASHBOARD
 def admin_dashboard(request):
-    if not request.user.is_authenticated or request.user.role != "ADMIN":
+    if not request.user.is_authenticated or str(request.user.role).upper() != "ADMIN":
         return HttpResponseForbidden("❌ Access Denied")
 
     if request.method == "POST":
@@ -104,7 +105,7 @@ def admin_dashboard(request):
 
 # 🧑‍💼 HR DASHBOARD
 def hr_dashboard(request):
-    if not request.user.is_authenticated or request.user.role not in ["HR", "ADMIN"]:
+    if not request.user.is_authenticated or str(request.user.role).upper() not in ["HR", "ADMIN"]:
         return HttpResponseForbidden("❌ Access Denied")
 
     today = timezone.now().date()
@@ -165,14 +166,14 @@ def hr_dashboard(request):
 
 # 🧑‍💼 MANAGER
 def manager_dashboard(request):
-    if not request.user.is_authenticated or request.user.role not in ["MANAGER", "ADMIN"]:
+    if not request.user.is_authenticated or str(request.user.role).upper() not in ["MANAGER", "ADMIN"]:
         return HttpResponseForbidden("❌ Access Denied")
     return hr_dashboard(request)
 
 
 # 💰 FINANCE
 def finance_dashboard(request):
-    if not request.user.is_authenticated or request.user.role not in ["FINANCE", "ADMIN"]:
+    if not request.user.is_authenticated or str(request.user.role).upper() not in ["FINANCE", "ADMIN"]:
         return HttpResponseForbidden("❌ Access Denied")
 
     today = timezone.now().date()
@@ -384,8 +385,10 @@ def employee_attendance(request):
 
 
 def employee_list(request):
-
-    employees = User.objects.filter(role__iexact='employee')
+    if str(request.user.role).upper() == "ADMIN":
+        employees = User.objects.all().order_by('role', 'first_name')
+    else:
+        employees = User.objects.filter(role__iexact='employee')
 
     context = {
         "employees": employees
